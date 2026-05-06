@@ -1,0 +1,863 @@
+<!-- ============================================================
+     DECISIONS THAT DEFINE — Event Registration Page
+     For embed inside a High Level funnel (Custom HTML element)
+     All CSS scoped to .dtd-page wrapper to avoid conflicts.
+     ============================================================ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Lato:wght@300;400;700&amp;display=swap" rel="stylesheet">
+
+<style>
+/* ---------- DTD scoped styles ---------- */
+.dtd-page, .dtd-page *, .dtd-page *::before, .dtd-page *::after { box-sizing: border-box; }
+.dtd-page {
+  --dtd-blue: #005FAF;
+  --dtd-blue-dark: #00467e;
+  --dtd-gray: #4D4D4D;
+  --dtd-gray-soft: #f4f5f7;
+  --dtd-gray-line: #e3e5ea;
+  --dtd-red: #B11F24;
+  --dtd-red-dark: #8e171b;
+  --dtd-white: #ffffff;
+  --dtd-ink: #1f2329;
+
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  color: var(--dtd-gray);
+  line-height: 1.65;
+  font-size: 17px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.dtd-page h1, .dtd-page h2, .dtd-page h3, .dtd-page h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: var(--dtd-ink);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5em;
+  line-height: 1.2;
+}
+.dtd-page p { margin: 0 0 1.1em; }
+.dtd-page a { color: var(--dtd-blue); text-decoration: none; }
+.dtd-page img { max-width: 100%; height: auto; display: block; }
+
+/* ---------- Layout ---------- */
+.dtd-section {
+  padding: 80px 24px;
+}
+.dtd-section--alt { background: var(--dtd-gray-soft); }
+.dtd-section--dark { background: var(--dtd-blue); color: #e7eef7; }
+.dtd-section--dark h1, .dtd-section--dark h2, .dtd-section--dark h3 { color: #ffffff; }
+
+.dtd-container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+.dtd-container--narrow { max-width: 760px; }
+
+/* ---------- Eyebrow ---------- */
+.dtd-eyebrow {
+  display: inline-block;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dtd-red);
+  margin-bottom: 18px;
+}
+.dtd-section--dark .dtd-eyebrow { color: #ffd9da; }
+
+/* ---------- Buttons ---------- */
+.dtd-btn {
+  display: inline-block;
+  background: var(--dtd-red);
+  color: #ffffff !important;
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 18px 38px;
+  border-radius: 2px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 14px rgba(177, 31, 36, 0.25);
+}
+.dtd-btn:hover { background: var(--dtd-red-dark); transform: translateY(-1px); }
+.dtd-btn--ghost {
+  background: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff !important;
+  box-shadow: none;
+  padding: 16px 36px;
+}
+.dtd-btn--ghost:hover { background: #ffffff; color: var(--dtd-blue) !important; }
+
+/* ---------- Hero ---------- */
+.dtd-hero {
+  position: relative;
+  padding: 90px 24px 90px;
+  background:
+    linear-gradient(180deg, rgba(0, 39, 75, 0.78) 0%, rgba(0, 39, 75, 0.85) 100%),
+    url('https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/67c8ad930315a00483c3661d.jpeg') center/cover no-repeat;
+  color: #ffffff;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+.dtd-hero > * { width: 100%; max-width: 100%; }
+.dtd-hero__logo {
+  width: 180px;
+  margin: 0 auto 28px;
+  opacity: 0.95;
+}
+.dtd-hero__eyebrow {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #ffd9da;
+  margin-bottom: 18px;
+}
+.dtd-hero h1 {
+  color: #ffffff;
+  font-size: clamp(38px, 6vw, 68px);
+  margin: 0 0 22px;
+  font-weight: 600;
+}
+.dtd-hero__sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: #ffffff;
+  max-width: 780px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 0;
+  margin-bottom: 8px;
+  line-height: 1.45;
+  font-weight: 500;
+  text-align: center !important;
+}
+.dtd-hero__lead {
+  max-width: 720px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 28px;
+  margin-bottom: 36px;
+  color: #e7eef7;
+  font-size: 17px;
+  text-align: center !important;
+}
+.dtd-hero__meta {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-top: 30px;
+  margin-bottom: 32px;
+  padding: 22px 24px;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  max-width: 580px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  text-align: center !important;
+}
+.dtd-hero__meta strong { color: #ffffff; font-weight: 700; display: block; font-size: 17px; margin-bottom: 4px; }
+.dtd-hero__seats {
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #ffd9da;
+  margin-bottom: 22px;
+}
+
+/* ---------- Section heads ---------- */
+.dtd-sectionhead { margin-bottom: 40px; }
+.dtd-sectionhead h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  margin-bottom: 16px;
+}
+.dtd-sectionhead .dtd-deck {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--dtd-blue);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 500;
+  line-height: 1.45;
+  margin-bottom: 0;
+}
+
+/* ---------- Question list ---------- */
+.dtd-questions {
+  margin: 30px 0 30px;
+  padding: 30px 36px;
+  background: #ffffff;
+  border-left: 4px solid var(--dtd-blue);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.dtd-questions p {
+  margin: 0 0 12px;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--dtd-ink);
+  font-size: 18px;
+  line-height: 1.5;
+}
+.dtd-questions p:last-child { margin-bottom: 0; }
+
+/* ---------- Outcome cards ---------- */
+.dtd-outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-top: 40px;
+}
+.dtd-outcome {
+  background: #ffffff;
+  padding: 36px 28px;
+  border-top: 4px solid var(--dtd-blue);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+.dtd-outcome__num {
+  font-family: 'Playfair Display', serif;
+  font-size: 44px;
+  color: var(--dtd-red);
+  line-height: 1;
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.dtd-outcome h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+.dtd-outcome p {
+  font-size: 15.5px;
+  margin: 0;
+}
+
+/* ---------- Checklist ---------- */
+.dtd-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 28px 0;
+}
+.dtd-checklist li {
+  position: relative;
+  padding: 12px 0 12px 38px;
+  border-bottom: 1px solid var(--dtd-gray-line);
+  font-size: 17px;
+  color: var(--dtd-ink);
+}
+.dtd-checklist li:last-child { border-bottom: none; }
+.dtd-checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 22px;
+  height: 12px;
+  border-left: 3px solid var(--dtd-red);
+  border-bottom: 3px solid var(--dtd-red);
+  transform: rotate(-45deg);
+}
+
+/* ---------- Pull quote ---------- */
+.dtd-pull {
+  border-left: 4px solid var(--dtd-red);
+  padding: 8px 0 8px 28px;
+  margin: 36px 0;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--dtd-ink);
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.45;
+}
+.dtd-pull p { margin: 0 0 10px; }
+.dtd-pull p:last-child { margin-bottom: 0; }
+
+/* ---------- Pillars (Professional/Personal/Spiritual) ---------- */
+.dtd-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 40px;
+}
+.dtd-pillar {
+  text-align: center;
+  padding: 30px 22px;
+  background: #ffffff;
+  border: 1px solid var(--dtd-gray-line);
+}
+.dtd-pillar h3 {
+  color: var(--dtd-blue);
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+.dtd-pillar p { font-size: 15.5px; margin: 0; }
+
+/* ---------- Schedule timeline ---------- */
+.dtd-day { margin-bottom: 36px; }
+.dtd-day__title {
+  font-family: 'Lato', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dtd-red);
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--dtd-red);
+}
+.dtd-event {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--dtd-gray-line);
+}
+.dtd-event:last-child { border-bottom: none; }
+.dtd-event__time {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  color: var(--dtd-blue);
+  font-size: 19px;
+  line-height: 1.3;
+}
+.dtd-event h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.dtd-event p { margin: 0 0 8px; font-size: 15.5px; }
+.dtd-event p:last-child { margin-bottom: 0; }
+
+/* ---------- Audience grid ---------- */
+.dtd-audience {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 30px 0;
+  padding: 0;
+  list-style: none;
+}
+.dtd-audience li {
+  background: #ffffff;
+  padding: 18px 22px;
+  border: 1px solid var(--dtd-gray-line);
+  border-left: 3px solid var(--dtd-blue);
+  font-weight: 700;
+  color: var(--dtd-ink);
+  font-size: 15.5px;
+}
+
+/* ---------- Final CTA ---------- */
+.dtd-final {
+  text-align: center;
+  background: var(--dtd-blue);
+  color: #ffffff;
+  padding: 90px 24px;
+}
+.dtd-final h2 {
+  color: #ffffff;
+  font-size: clamp(30px, 4vw, 46px);
+  margin-bottom: 22px;
+}
+.dtd-final p { color: #e7eef7; max-width: 700px; margin-left: auto; margin-right: auto; }
+.dtd-final__meta {
+  margin: 32px auto 28px;
+  padding: 22px 24px;
+  border-top: 1px solid rgba(255,255,255,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.25);
+  max-width: 560px;
+  font-size: 15.5px;
+  letter-spacing: 0.04em;
+}
+.dtd-final__meta strong { color: #ffffff; font-weight: 700; display: block; font-size: 18px; margin-bottom: 4px; }
+
+/* ---------- Footer / fine print ---------- */
+.dtd-footer {
+  background: #1a1d22;
+  color: #b9bdc4;
+  padding: 50px 24px;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.dtd-footer img {
+  width: 56px;
+  margin: 0 auto 18px;
+  opacity: 0.9;
+}
+.dtd-footer p { max-width: 720px; margin: 0 auto 10px; }
+.dtd-footer .dtd-footer__brand {
+  font-family: 'Playfair Display', serif;
+  color: #ffffff;
+  font-style: italic;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+/* ---------- Decorative divider ---------- */
+.dtd-divider {
+  width: 64px;
+  height: 3px;
+  background: var(--dtd-red);
+  margin: 0 0 28px;
+  border: none;
+}
+.dtd-divider--center { margin-left: auto; margin-right: auto; }
+
+/* ---------- Featured image strip ---------- */
+.dtd-feature-img {
+  margin: 0 auto 40px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 760px) {
+  .dtd-page { font-size: 16px; }
+  .dtd-section { padding: 56px 20px; }
+  .dtd-hero { padding: 70px 20px; }
+  .dtd-hero__logo { width: 140px; }
+  .dtd-outcomes,
+  .dtd-pillars { grid-template-columns: 1fr; gap: 18px; }
+  .dtd-audience { grid-template-columns: 1fr; }
+  .dtd-event { grid-template-columns: 1fr; gap: 6px; }
+  .dtd-event__time { font-size: 17px; }
+  .dtd-questions { padding: 24px 22px; }
+  .dtd-questions p { font-size: 16.5px; }
+  .dtd-btn { padding: 16px 28px; font-size: 14px; }
+  .dtd-final { padding: 60px 20px; }
+}
+</style>
+
+<div class="dtd-page">
+
+  <!-- ============================================================ HERO ============================================================ -->
+  <section class="dtd-hero cw-selected-element" style="background-attachment: fixed;">
+    <img class="dtd-hero__logo" src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/69f4de93bbacf0a05611dab5.png" alt="Authentic Leader Forums">
+    <div class="dtd-hero__eyebrow">Authentic Leader Forums Presents</div>
+    <h1 class="">Decisions That Define</h1>
+    <p class="dtd-hero__sub">Authentic Leader Lab:<br><span style="font-style: normal; font-size: clamp(18px, 2.2vw, 24px);">A Deep-Dive into Peer-Powered Growth</span></p>
+    <p class="dtd-hero__lead">A complimentary half-day of <b>peer-powered growth </b>for business leaders who want to make better decisions, connect with like-minded peers, and lead a more integrated life.</p>
+
+    <div class="dtd-hero__meta">
+      <strong>Friday, June 26, 2026</strong>
+      University of Dallas · College of Business, SB Hall<br>
+      2815 Lynch Circle, Irving, TX 75062
+    </div>
+
+    <img src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/69f8b855d38dd61887b7d30a.png" alt="University of Dallas" style="width: 225px; max-width: 80%; height: auto; margin: 0 auto 28px; display: block; opacity: 0.95;">
+
+    <div class="dtd-hero__seats">Complimentary Event · Seats Are Limited</div>
+    <a class="dtd-btn" href="http://conference.integratedlife.network/register">Register for June 26</a>
+  </section>
+
+
+  <!-- ============================================================ SECTION 1 — REALITY OF LEADERSHIP ============================================================ -->
+  <section class="dtd-section cw-selected-element">
+    <div class="dtd-container dtd-container--narrow">
+      <div class="dtd-sectionhead">
+        <span class="dtd-eyebrow">The Reality of Leadership</span>
+        <h1 class="" style="">Leadership Is Heavy Because <span style="color: rgb(177, 31, 36);">Decisions </span>Matter</h1>
+      </div>
+
+      <p class="">Every leader eventually faces decisions where the profitable answer, the expected answer, and the principled answer may not be the same.</p>
+
+      <p>At the Authentic Leader Lab Experience, you will step inside a trusted peer environment designed to help serious leaders think more clearly, process complex decisions, and evaluate whether the most important dimensions of life are working together — or quietly pulling apart.</p>
+
+      <p>Your team looks to you for direction. Your organization depends on your judgment. Your decisions affect people, resources, families, culture, reputation, and mission.</p>
+
+      <p>Most leaders have places where they can talk about strategy, revenue, operations, and performance. Far fewer have a trusted place to process the harder questions:</p>
+
+      <div class="dtd-questions">
+        <p>What is the right thing to do when the answer is not obvious?</p>
+        <p>Who will be affected by this decision?</p>
+        <p>What principles should guide the next step?</p>
+        <p>Where are my blind spots?</p>
+        <p>What pressures may be distorting my judgment?</p>
+        <p>How do I lead with both conviction and humility?</p>
+      </div>
+
+      <p>Leadership can be isolating, especially when the decisions are complex and the stakes are real.</p>
+
+      <p style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--dtd-blue); font-size: 22px; line-height: 1.4;">You do not have to carry that weight alone.</p>
+
+      <p style="text-align: center; margin-top: 40px;"><a class="dtd-btn" href="http://conference.integratedlife.network/register">Register for June 26</a></p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 2 — WHAT THIS EXPERIENCE IS ============================================================ -->
+  <section class="dtd-section dtd-section--alt">
+    <div class="dtd-container">
+      <div class="dtd-sectionhead" style="text-align:center;">
+        <span class="dtd-eyebrow">What This Experience Is</span>
+        <h2>A Practical Introduction to Authentic Leader Forums</h2>
+        <hr class="dtd-divider dtd-divider--center">
+      </div>
+
+      <p style="text-align:center; max-width:760px; margin: 0 auto 12px;">The June 26 Authentic Leader Lab Experience is designed for business leaders, executives, owners, and senior decision-makers who want more than another motivational talk or networking event.</p>
+      <p style="text-align:center; max-width:760px; margin: 0 auto;">This is a guided deep-dive into peer-powered growth built around three outcomes:</p>
+
+      <div class="dtd-outcomes">
+        <div class="dtd-outcome">
+          <div class="dtd-outcome__num">01</div>
+          <h3>Meaningful Peer Connection</h3>
+          <p>You will spend time with other leaders who understand the weight of responsibility and the loneliness that can come with leadership.</p>
+        </div>
+        <div class="dtd-outcome">
+          <div class="dtd-outcome__num">02</div>
+          <h3>A Practical Decision-Making Tool</h3>
+          <p>You will be introduced to a principled decision-making framework you can use when real leadership decisions involve competing pressures, unclear tradeoffs, and serious consequences.</p>
+        </div>
+        <div class="dtd-outcome">
+          <div class="dtd-outcome__num">03</div>
+          <h3>A Personal Integration Assessment</h3>
+          <p>You will evaluate how integrated your life really is across professional, personal, and spiritual dimensions — not as a vague idea, but as a practical leadership question.</p>
+        </div>
+      </div>
+
+      <p style="text-align:center; margin-top: 40px; font-family: 'Playfair Display', serif; font-style: italic; color: var(--dtd-ink); font-size: 20px;">The morning is designed to give you something useful before you leave the room.</p>
+
+      <!-- What are the Authentic Leader Forums? sub-block -->
+      <div style="max-width: 760px; margin: 70px auto 0; padding-top: 50px; border-top: 1px solid var(--dtd-gray-line); text-align: center;">
+        <span class="dtd-eyebrow">About the Forums</span>
+        <h3 style="font-family: 'Playfair Display', serif; font-size: clamp(26px, 3.2vw, 34px); color: var(--dtd-ink); font-weight: 700; line-height: 1.25; margin: 0 0 22px;">What are the Authentic Leader Forums?</h3>
+        <p style="text-align: left;">The Authentic Leader Forums are, specifically, peer groups comprised of business executives, owners and professionals serving as a respite from the isolation that often comes with leadership, and to maintain momentum toward an integrated life.</p>
+        <p style="text-align: left;">While the Forums and its frameworks are built upon timeless Catholic principles, involvement and membership remain open to all like-minded leaders.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 3 — WHAT YOU WILL WALK AWAY WITH ============================================================ -->
+  <section class="dtd-section">
+    <div class="dtd-container dtd-container--narrow">
+      <div class="dtd-sectionhead">
+        <span class="dtd-eyebrow">What You Will Walk Away With</span>
+        <h2>This Is a <i>Working </i>Lab, Not a Sit-and-Listen Conference</h2>
+      </div>
+
+      <p>By the end of the morning, you will have experienced how Authentic Leader Forums help leaders process real issues through structured peer conversation, practical tools, and guided reflection.</p>
+
+      <p><strong style="color: var(--dtd-ink);">You will walk away with:</strong></p>
+
+      <ul class="dtd-checklist">
+        <li>New connections with other serious leaders</li>
+        <li>Access to attendee contact information for post-event follow-up</li>
+        <li>A practical introduction to the Principled Decision-Making framework</li>
+        <li>A four-step process for evaluating difficult decisions</li>
+        <li>A clearer understanding of how human dignity and the common good can guide leadership judgment</li>
+        <li>A guided assessment of how integrated your own life currently is</li>
+        <li>A better understanding of how peer forums can support leadership, character, and accountability</li>
+      </ul>
+
+      <p>You may also receive a preview of an AI-guided version of the Principled Decision-Making process, designed to help leaders walk through the framework with greater clarity and consistency.</p>
+
+      <p style="text-align: center; margin-top: 40px;"><a class="dtd-btn" href="http://conference.integratedlife.network/register">Register for June 26</a></p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 4 — SESSION ONE ============================================================ -->
+  <section class="dtd-section dtd-section--alt">
+    <div class="dtd-container">
+
+      <img class="dtd-feature-img" src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/69f4de71bbacf0a05611d414.webp" alt="Decisions That Define" style="width: 564px; height: auto;">
+
+      <div class="dtd-sectionhead" style="text-align:center;">
+        <span class="dtd-eyebrow">Session One</span>
+        <h2>Principled Decision-Making in Practice</h2>
+        <p class="dtd-deck">A guided working session for leaders facing complex decisions.</p>
+      </div>
+
+      <div style="max-width: 760px; margin: 0 auto;">
+        <p>The first major session introduces the Principled Decision-Making framework — a practical process for evaluating difficult leadership decisions when competing goods are in tension.</p>
+
+        <p>Some decisions are not hard because there is too little information. They are hard because several important things may be true at the same time.</p>
+
+        <p>A decision may affect profitability, employee well-being, customer trust, organizational reputation, family pressure, stakeholder expectations, and long-term mission — all at once.</p>
+
+        <p>This session will introduce a four-step process designed to help leaders slow down, think clearly, and make decisions with greater integrity.</p>
+
+        <p><strong style="color: var(--dtd-ink);">You will learn how to:</strong></p>
+
+        <ul class="dtd-checklist">
+          <li>Define the real problem</li>
+          <li>Identify the people and stakeholders affected</li>
+          <li>Consider possible paths forward</li>
+          <li>Evaluate decisions in light of both human dignity and the common good</li>
+        </ul>
+
+        <p>The session will include a real-world leadership scenario and guided group processing, so attendees can see how the framework works in practice.</p>
+
+        <div class="dtd-pull">
+          <p>The goal is not theory.</p>
+          <p>The goal is to give leaders a framework they have <span style="font-style: normal; font-weight: 700; letter-spacing: 0.03em;">NEVER SEEN</span>, with an <span style="font-style: normal; font-weight: 700; letter-spacing: 0.03em; color: var(--dtd-red);">AI-POWERED DEPLOYMENT TOOL</span> they can actually use.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 5 — WHY IT MATTERS ============================================================ -->
+  <section class="dtd-section dtd-section--dark">
+    <div class="dtd-container dtd-container--narrow">
+      <div class="dtd-sectionhead">
+        <span class="dtd-eyebrow">Why Principled Decision-Making Matters</span>
+        <h2>Better Decisions Require More Than Better Information</h2>
+      </div>
+
+      <p>Business leaders are often expected to move quickly. But speed is not the same thing as clarity.</p>
+
+      <p style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 22px; line-height: 1.5; color: #ffffff; border-left: 3px solid #ffd9da; padding-left: 22px; margin: 30px 0;">
+        The profitable decision is not always the principled one.<br>
+        The expected decision is not always the wise one.<br>
+        The easiest decision is not always the most responsible one.
+      </p>
+
+      <p>Principled decision-making gives leaders a structured way to pause, examine the human impact of a decision, clarify the common good, and choose a path that is both practical and worthy of trust.</p>
+
+      <p>It does not remove the burden of leadership.</p>
+
+      <p style="font-family: 'Playfair Display', serif; font-style: italic; color: #ffffff; font-size: 24px; line-height: 1.4;">It helps leaders carry that burden with greater clarity.</p>
+
+      <p style="margin-top: 40px;"><a class="dtd-btn dtd-btn--ghost" href="http://conference.integratedlife.network/register">Register for June 26</a></p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 6 — SESSION TWO ============================================================ -->
+  <section class="dtd-section">
+    <div class="dtd-container">
+      <div class="dtd-sectionhead" style="text-align:center;">
+        <span class="dtd-eyebrow">Session Two</span>
+        <h2>How Integrated Is Your Life?</h2>
+        <p class="dtd-deck">A guided leadership reflection on professional, personal, and spiritual alignment.</p>
+      </div>
+
+      <div style="max-width: 760px; margin: 0 auto;">
+        <p>The second major session moves from decision-making to the leader making the decisions.</p>
+
+        <p>Because leadership is never only about what you decide. It is also about who you are becoming as you lead.</p>
+
+        <p>In this session, we will introduce what we mean — and do not mean — by an integrated life.</p>
+
+        <p>By a divided life, we are not talking about a hidden double life. We are talking about the quieter fragmentation many leaders experience when work, personal responsibility, and spiritual grounding begin operating in separate compartments.</p>
+
+        <p>You may be successful, respected, and responsible — while still sensing that the most important parts of your life are not fully working together.</p>
+
+        <p>This session will help you evaluate your own life through three dimensions:</p>
+      </div>
+
+      <div class="dtd-pillars">
+        <div class="dtd-pillar">
+          <h3>Professional</h3>
+          <p>Is your work aligned with mission, responsibility, and healthy execution?</p>
+        </div>
+        <div class="dtd-pillar">
+          <h3>Personal</h3>
+          <p>Are your habits, relationships, decisions, and character supporting the person you are called to become?</p>
+        </div>
+        <div class="dtd-pillar">
+          <h3>Spiritual</h3>
+          <p>Is your interior life grounding your leadership, or has it been pushed to the margins?</p>
+        </div>
+      </div>
+
+      <div style="max-width: 760px; margin: 40px auto 0;">
+        <p style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--dtd-ink); font-size: 20px; text-align: center;">This is not about guilt. It is not about perfection. It is about honest clarity.</p>
+
+        <p>The goal is to help leaders recognize where integration is strong, where division may be forming, and what the next step toward wholeness may look like.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 7 — EVENT FLOW ============================================================ -->
+  <section class="dtd-section dtd-section--alt">
+    <div class="dtd-container dtd-container--narrow">
+      <div class="dtd-sectionhead" style="text-align:center;">
+        <span class="dtd-eyebrow">Event Flow</span>
+        <h2>What to Expect</h2>
+        <hr class="dtd-divider dtd-divider--center">
+      </div>
+
+      <div class="dtd-day">
+        <div class="dtd-day__title">Thursday Evening · June 25</div>
+        <div class="dtd-event">
+          <div class="dtd-event__time">5:00 PM</div>
+          <div>
+            <h3>Welcome Reception</h3>
+            <p>An informal opportunity to meet other attendees, connect with the hosts, and begin building relationships before the Friday morning work session.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dtd-day">
+        <div class="dtd-day__title">Friday Morning · June 26</div>
+
+        <div class="dtd-event">
+          <div class="dtd-event__time">8:00 AM</div>
+          <div>
+            <h3>Coffee, Arrival, and Peer Connection</h3>
+            <p>Arrive, settle in, meet other leaders, and begin the morning with informal connection.</p>
+            <p>Attendees will also receive access to a shared attendee list so meaningful follow-up can continue after the event.</p>
+          </div>
+        </div>
+
+        <div class="dtd-event">
+          <div class="dtd-event__time">9:00 AM</div>
+          <div>
+            <h3>Principled Decision-Making in Practice</h3>
+            <p>A guided lab introducing the Principled Decision-Making framework and its four-step process.</p>
+            <p>Attendees will work through a real-world leadership scenario and learn how to evaluate difficult decisions through the lens of human dignity, the common good, stakeholder impact, and long-term consequence.</p>
+          </div>
+        </div>
+
+        <div class="dtd-event">
+          <div class="dtd-event__time">9:45 AM</div>
+          <div>
+            <h3>Break</h3>
+          </div>
+        </div>
+
+        <div class="dtd-event">
+          <div class="dtd-event__time">10:15 AM</div>
+          <div>
+            <h3>How Integrated Is Your Life?</h3>
+            <p>A guided leadership reflection on the alignment between your professional, personal, and spiritual life.</p>
+            <p>This session will help attendees evaluate where life is integrated, where it may be quietly divided, and what practical next steps may support greater clarity, character, and wholeness.</p>
+          </div>
+        </div>
+
+        <div class="dtd-event">
+          <div class="dtd-event__time">10:55 AM</div>
+          <div>
+            <h3>Closing and Next Steps</h3>
+            <p>A brief closing session with practical takeaways and an invitation to consider whether Authentic Leader Forums may be the right ongoing peer environment for your leadership journey.</p>
+          </div>
+        </div>
+      </div>
+
+      <p style="text-align: center; margin-top: 40px;"><a class="dtd-btn" href="http://conference.integratedlife.network/register">Register for June 26</a></p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 8 — WHO SHOULD ATTEND ============================================================ -->
+  <section class="dtd-section">
+    <div class="dtd-container">
+      <div class="dtd-sectionhead" style="text-align:center;">
+        <span class="dtd-eyebrow">Who Should Attend</span>
+        <h2>This Experience Is Designed for Leaders Who Carry Real Responsibility</h2>
+      </div>
+
+      <p style="text-align:center; max-width:680px; margin: 0 auto 10px;">This event is ideal for:</p>
+
+      <ul class="dtd-audience">
+        <li>Business Owners</li>
+        <li>Entrepreneurs</li>
+        <li>Executives</li>
+        <li>Senior Leaders</li>
+        <li>Organizational Decision-Makers</li>
+        <li>Leaders Responsible for People, Culture, Resources, and Mission</li>
+      </ul>
+
+      <div style="max-width: 720px; margin: 30px auto 0; text-align: center;">
+        <p>Professionals who want their leadership to reflect their deepest values.</p>
+        <p>You do not need to have everything figured out.</p>
+        <p style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--dtd-blue); font-size: 21px; line-height: 1.45;">You simply need to be serious about becoming a better, more integrated leader — and open to doing that work alongside other leaders who are pursuing the same thing.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 9 — WHAT YOU WILL RECEIVE ============================================================ -->
+  <section class="dtd-section dtd-section--alt">
+    <div class="dtd-container dtd-container--narrow">
+      <div class="dtd-sectionhead">
+        <span class="dtd-eyebrow">What You Will Receive</span>
+        <h2>You Will Leave With More Than Notes</h2>
+      </div>
+
+      <p>Each attendee will receive practical print materials introducing the Principled Decision-Making framework and the Integrated Life reflection process.</p>
+
+      <p>These are not sales pieces. They are working tools designed to help you continue applying what you experience during the event.</p>
+
+      <p><strong style="color: var(--dtd-ink);">You will leave with:</strong></p>
+
+      <ul class="dtd-checklist">
+        <li>A clear introduction to the four-step Principled Decision-Making process</li>
+        <li>A practical framework for evaluating complex leadership decisions</li>
+        <li>A better understanding of how to balance human dignity and the common good</li>
+        <li>A personal reflection process for evaluating integration in your own life</li>
+        <li>New peer connections with other leaders in the room</li>
+        <li>A clearer sense of whether an ongoing Authentic Leader Forum may be right for you</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ SECTION 10 — ABOUT ============================================================ -->
+  <section class="dtd-section">
+    <div class="dtd-container dtd-container--narrow" style="text-align: center;">
+      <img src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/68712c186975b32c5a8766d5.png" alt="Authentic Leader Forums" style="width: 90px; margin: 0 auto 24px;">
+
+      <span class="dtd-eyebrow">About Authentic Leader Forums</span>
+      <h2>A Trusted Peer Environment for Leaders Who Want to Lead With Greater Clarity, Character, and Integrity</h2>
+      <hr class="dtd-divider dtd-divider--center" style="margin-top: 28px;">
+
+      <p>Authentic Leader Forums bring together business leaders in confidential peer groups designed to support clearer decision-making, stronger character, and deeper integration between personal values and professional responsibility.</p>
+
+      <p>The wisdom does not come from a stage. It comes through structured conversation, trusted peers, honest reflection, and practical tools leaders can use in real situations.</p>
+
+      <p>The goal is not simply to become more successful.</p>
+
+      <p style="font-family: 'Playfair Display', serif; font-style: italic; color: var(--dtd-blue); font-size: 23px; line-height: 1.45;">The goal is to become more whole — and to lead from that wholeness with greater clarity, peace, and purpose.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ FINAL CTA ============================================================ -->
+  <section class="dtd-final">
+    <div class="dtd-container dtd-container--narrow">
+      <span class="dtd-eyebrow" style="color:#ffd9da;">Reserve Your Seat</span>
+      <h2>Register for the June 26 Authentic Leadership Lab Experience</h2>
+
+      <p>If you are a business leader who carries real responsibility, this complimentary half-day experience is designed for you.</p>
+
+      <p>Come connect with other serious leaders, learn a practical framework for principled decision-making, and evaluate how integrated your life and leadership really are.</p>
+
+      <div class="dtd-final__meta">
+        <strong>Friday, June 26, 2026</strong>
+        University of Dallas · College of Business, SB Hall<br>
+        2815 Lynch Circle, Irving, TX 75062
+      </div>
+
+      <img src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/69f8b855d38dd61887b7d30a.png" alt="University of Dallas" style="width: 225px; max-width: 80%; height: auto; margin: 0 auto 28px; display: block; opacity: 0.95;">
+
+      <div style="font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: #ffd9da; margin-bottom: 24px;">Complimentary Event · Seats Are Limited</div>
+
+      <a class="dtd-btn" href="http://conference.integratedlife.network/register">Register for June 26</a>
+    </div>
+  </section>
+
+
+  <!-- ============================================================ FOOTER / FINE PRINT ============================================================ -->
+  <footer class="dtd-footer">
+    <img src="https://assets.cdn.filesafe.space/uMP8kbHfqbJ5EfhR7zWz/media/68712c186975b32c5a8766d5.png" alt="Authentic Leader Forums">
+    <div class="dtd-footer__brand">Authentic Leader Forums</div>
+    <p><strong style="color:#ffffff;">Registration Note</strong></p>
+    <p>By registering, attendees agree to have their name, title, organization, and email address shared with other confirmed attendees for post-event networking and follow-up purposes.</p>
+  </footer>
+
+</div>
+<!-- ============================================================ END DECISIONS THAT DEFINE ============================================================ -->
