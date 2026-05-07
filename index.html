@@ -69,6 +69,33 @@
     letter-spacing: 0.04em;
     vertical-align: middle;
   }
+  header h1 .separator {
+    color: var(--border);
+    font-weight: 300;
+    margin: 0 8px;
+    font-size: 16px;
+  }
+  header h1 .tagline {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    margin-right: 10px;
+  }
+  header .help-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+  }
+  header .help-link:hover {
+    color: var(--accent);
+    background: #f0f2f5;
+    border-color: var(--border);
+  }
   header .filename {
     color: var(--muted);
     font-size: 13px;
@@ -508,7 +535,7 @@
 <body class="view-page">
 
 <header>
-  <h1><span class="dot"></span>Camille <span class="version">v1.2</span> <span class="filename" id="filename-label"></span></h1>
+  <h1><span class="dot"></span>Camille<span class="separator">|</span><span class="tagline">Visual Composition for the AI-Built Web</span><span class="version">v1.2</span> <span class="filename" id="filename-label"></span></h1>
   <div class="header-actions">
     <label class="btn" for="file-input" title="Open an HTML file">Open File</label>
     <input type="file" id="file-input" accept=".html,.htm,text/html">
@@ -525,6 +552,7 @@
     <button id="copy-btn" title="Copy HTML to clipboard">Copy HTML</button>
     <button id="save-btn" class="primary" title="Save to disk (overwrite if you've used Save As, otherwise download)">Save</button>
     <button id="save-as-btn" title="Save to a new file (choose location and name)">Save As</button>
+    <a class="help-link" href="https://github.com/keith1817/camille/blob/main/Camille-User-Guide.md" target="_blank" rel="noopener" title="Open the User Guide in a new tab">Guide ↗</a>
   </div>
 </header>
 
@@ -587,6 +615,10 @@
       <div class="hint" style="margin-top: 6px;">Works with full pages or content fragments</div>
     </div>
     <div class="welcome-footer">
+      <a href="https://github.com/keith1817/camille/blob/main/Camille-User-Guide.md" target="_blank" rel="noopener">User Guide</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/keith1817/camille" target="_blank" rel="noopener">GitHub</a>
+      &nbsp;·&nbsp;
       Copyright © 2026 <a href="https://camille.sypmedia.com" target="_blank" rel="noopener">SYP Media LLC</a>. All rights reserved.
     </div>
   </div>
