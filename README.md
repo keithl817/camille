@@ -4,7 +4,7 @@
 
 **Visual Composition for the AI-Built Web** — a self-contained WYSIWYG HTML editor that runs in your browser. Single file, no installation, no server, no build step.
 
-Live at **[camille.sypmedia.com](https://camille.sypmedia.com)**.
+Live at **[app.camillehtml.com](https://app.camillehtml.com)**.
 
 ## What it's for
 
@@ -41,7 +41,7 @@ Just open `index.html` in a modern browser. No setup. The CodeMirror dependencie
 
 ## Hosting
 
-This repo is configured for GitHub Pages with the custom domain `camille.sypmedia.com` (see `CNAME`). Pushing to `main` deploys automatically.
+This repo is configured for GitHub Pages with the custom domain `app.camillehtml.com` (see `CNAME`). Pushing to `main` deploys automatically.
 
 ## License & copyright
 

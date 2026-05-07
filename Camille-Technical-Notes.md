@@ -6,7 +6,7 @@
 
 A handover doc for future maintenance and extension. The intended reader is "future Claude or another developer adding a feature without re-deriving every design decision."
 
-> Live at **[camille.sypmedia.com](https://camille.sypmedia.com)** · Copyright © 2026 SYP Media LLC. All rights reserved.
+> Live at **[app.camillehtml.com](https://app.camillehtml.com)** · Copyright © 2026 SYP Media LLC. All rights reserved.
 
 ## Project layout
 

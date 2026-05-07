@@ -6,11 +6,11 @@
 
 A self-contained WYSIWYG HTML editor that runs in your browser. Single file, no installation, no server. Designed for editing content blocks (the kind you paste into HighLevel's Custom HTML element) and standalone HTML pages alike.
 
-> Live at **[camille.sypmedia.com](https://camille.sypmedia.com)** · Copyright © 2026 SYP Media LLC. All rights reserved.
+> Live at **[app.camillehtml.com](https://app.camillehtml.com)** · Copyright © 2026 SYP Media LLC. All rights reserved.
 
 ## Quick start
 
-Visit **[camille.sypmedia.com](https://camille.sypmedia.com)** in your browser, or open the local `index.html` file directly. Chrome and Edge have a few extra capabilities — see [Browser support](#browser-support) at the end.
+Visit **[app.camillehtml.com](https://app.camillehtml.com)** in your browser, or open the local `index.html` file directly. Chrome and Edge have a few extra capabilities — see [Browser support](#browser-support) at the end.
 
 The welcome screen offers four ways to get started:
 
