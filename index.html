@@ -601,7 +601,7 @@
   <textarea id="source-view" spellcheck="false"></textarea>
 
   <div id="welcome">
-    <img class="welcome-logo" src="https://assets.cdn.filesafe.space/e3LOYAHOBn0PFjgBHsPS/media/69fbcdf4533d641a893d0934.webp" alt="Camille — Visual Composition for the AI-Built Web">
+    <img class="welcome-logo" src="Camille_logo_ltbg_tag_1000.webp" alt="Camille — Visual Composition for the AI-Built Web">
     <p class="welcome-version">v1.2</p>
     <p>Edit full HTML pages or content blocks visually. Click any text to edit, use the toolbar for formatting, then save back to a file or copy to your clipboard.</p>
     <div class="actions">
@@ -906,6 +906,14 @@
     const injectedStyle = root.querySelector('#cw-img-styles');
     if (injectedStyle) injectedStyle.remove();
     root.querySelectorAll('.cw-selected-img').forEach(el => el.classList.remove('cw-selected-img'));
+    // Strip element-selection artifacts (parallel to image-selection cleanup above).
+    // Without this, the cw-selected-element class and its outline style block leak into saved HTML.
+    const selStyle = root.querySelector('#cw-sel-styles');
+    if (selStyle) selStyle.remove();
+    root.querySelectorAll('.cw-selected-element').forEach(el => {
+      el.classList.remove('cw-selected-element');
+      if (el.classList.length === 0) el.removeAttribute('class');
+    });
     // Normalize meta charset to UTF-8 (we always write UTF-8 bytes on save)
     const head = root.querySelector('head');
     if (head) {
