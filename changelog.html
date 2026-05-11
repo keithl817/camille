@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camille Changelog — Version History</title>
+<meta name="description" content="Version history for Camille, the free browser-based WYSIWYG HTML editor for AI-generated web pages. What changed in each release.">
+<meta name="author" content="SYP Media LLC">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://camillehtml.com/changelog">
+
+<!-- Fraunces — display serif (variable: weight + SOFT axis) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..800,0..100&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --copper:        #7F5149;
+    --copper-soft:   #BF9F98;
+    --cream:         #F4EDEB;
+    --charcoal:      #3A3938;
+
+    --bg: var(--cream);
+    --panel: #ffffff;
+    --border: #E5D7D1;
+    --text: var(--charcoal);
+    --muted: #7d6e68;
+    --accent: var(--copper);
+    --accent-hover: #6a3f38;
+    --accent-soft: #F0E1DC;
+
+    --success: #1a7f37;
+    --shadow-sm: 0 1px 2px rgba(58,57,56,0.08);
+    --shadow: 0 1px 2px rgba(58,57,56,0.08), 0 4px 12px rgba(58,57,56,0.05);
+    --radius: 10px;
+    --maxw: 1120px;
+    --maxw-content: 860px;
+
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  img { max-width: 100%; height: auto; }
+
+  /* Header */
+  .site-header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(180%) blur(8px);
+  }
+  .site-header .inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: center; }
+  .brand img { height: 60px; width: auto; max-width: 220px; display: block; }
+  .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav-links a {
+    padding: 8px 12px; border-radius: 6px; font-size: 14px; color: var(--muted);
+  }
+  .nav-links a:hover { color: var(--accent); background: var(--accent-soft); text-decoration: none; }
+  .nav-cta {
+    background: var(--accent); color: #fff;
+    padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 14px;
+    border: 1px solid var(--accent);
+  }
+  .nav-cta:hover { background: var(--accent-hover); color: #fff; text-decoration: none; }
+
+  /* Page hero */
+  .page-hero {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 24px 44px;
+  }
+  .page-hero .container { max-width: var(--maxw-content); margin: 0 auto; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 14px;
+  }
+  h1 {
+    font-family: var(--serif);
+    font-size: 44px; font-weight: 700;
+    margin: 0 0 14px; letter-spacing: -0.02em; line-height: 1.15;
+    color: var(--text);
+  }
+  .lede { font-size: 18px; color: var(--muted); margin: 0; max-width: 720px; }
+
+  /* Main */
+  main { padding: 56px 24px 80px; }
+  main .container { max-width: var(--maxw-content); margin: 0 auto; }
+
+  /* Release card */
+  .release {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 36px 36px 28px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+  }
+  .release-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .release-version {
+    font-family: var(--serif);
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .release-date {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .release-intro {
+    margin: 0 0 18px;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  .release-section { margin: 22px 0; }
+  .release-section h3 {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin: 0 0 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-soft);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+  .release-section ul {
+    margin: 0;
+    padding-left: 22px;
+    list-style: none;
+  }
+  .release-section li {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    position: relative;
+  }
+  .release-section li::before {
+    content: '';
+    position: absolute;
+    left: -18px; top: 10px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--copper-soft);
+  }
+  .release-section li strong { color: var(--text); font-weight: 600; }
+
+  .release.minor { padding: 26px 32px 18px; }
+  .release.minor .release-version { font-size: 28px; }
+  .release.minor .release-intro { font-size: 15px; color: var(--muted); }
+
+  /* Footer */
+  footer {
+    background: var(--charcoal);
+    color: var(--cream);
+    padding: 28px 24px;
+    margin-top: 40px;
+  }
+  footer .inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 13px;
+  }
+  footer a { color: var(--copper-soft); }
+  footer a:hover { color: var(--cream); }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 34px; }
+    .release { padding: 24px 20px; }
+    .release-version { font-size: 32px; }
+    .page-hero { padding: 44px 20px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="https://camillehtml.com/" aria-label="Camille — home">
+      <img src="https://assets.cdn.filesafe.space/e3LOYAHOBn0PFjgBHsPS/media/69fca6036f6342abb3a95d7f.webp" alt="Camille — Visual Composition for the AI-Built Web">
+    </a>
+    <nav class="nav-links">
+      <a href="https://camillehtml.com/#problem">Why</a>
+      <a href="https://camillehtml.com/#features">Features</a>
+      <a href="https://camillehtml.com/#compare">Compare</a>
+      <a href="https://camillehtml.com/#faq">FAQ</a>
+      <a href="https://camillehtml.com/userguide" target="_blank">User Guide</a>
+    </nav>
+    <a class="nav-cta" href="https://app.camillehtml.com/" target="_blank" rel="noopener">Open Camille →</a>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">Version History</span>
+    <h1>What's changed in each release.</h1>
+    <p class="lede">Camille evolves alongside the AI tooling it polishes. Below: what shipped, what got smoother, and what got fixed.</p>
+  </div>
+</section>
+
+<main>
+  <div class="container">
+
+    <!-- ============================ v1.5 ============================ -->
+    <article class="release">
+      <header class="release-header">
+        <div class="release-version">v1.5</div>
+        <div class="release-date">May 2026</div>
+      </header>
+
+      <p class="release-intro">
+        v1.5 turns Camille from a quick-polish editor into a fuller last-mile tool for AI-generated HTML.
+        New panels for typography, metadata, schema, tracking, and media. A typographic system that
+        round-trips between pages. And a sharpened take on what Camille is for.
+      </p>
+
+      <div class="release-section">
+        <h3>✦ New panels &amp; features</h3>
+        <ul>
+          <li><strong>Type Styles panel.</strong> Define the page's typography in one place: master Headline and Content fonts, Text and Link colors, plus per-element overrides for thirteen typographic roles (H1–H6, paragraph, lists, hyperlinks, blockquote, preformatted, more).</li>
+          <li><strong>Custom Google Fonts picker.</strong> Browse forty curated Google Fonts with each name rendered in its own typeface. Free-text field for any Google Font name. Picker also doubles as the page's font loader — selecting a font auto-injects the right <code>&lt;link&gt;</code> tag so it actually renders.</li>
+          <li><strong>Round-trip typography spec.</strong> Export the page's full type system as portable CSS (with <code>:root</code> custom properties), structured JSON, or a natural-language brief. Import a spec back via paste, drag-and-drop, or file picker. Capture the current page's rendered typography on demand if you haven't set anything yet.</li>
+          <li><strong>Metadata + Schema panel.</strong> Single-source page title, description, and hero image emit standard <code>&lt;meta&gt;</code>, Open Graph, and Twitter Card tags from the same inputs. Live Facebook-style social-share preview card. JSON-LD schema detection with view / raw-edit / toggle, plus four ready-to-fill templates (Article, Organization, FAQPage, LocalBusiness) and a "send to AI" prompt for finishing them off.</li>
+          <li><strong>Tracking Codes panel.</strong> Eight built-in trackers: Google Analytics 4, Google Tag Manager, Meta Pixel, TikTok Pixel, LinkedIn Insight, HighLevel External Tracking, Microsoft Clarity, Hotjar. Camille detects existing trackers and lets you edit their IDs in place without disturbing surrounding code. Add new trackers from canonical vendor snippets. "Other scripts" section catches anything not matching a known pattern.</li>
+          <li><strong>Media panel.</strong> Paste an image or video URL to insert at the cursor. Video auto-detects YouTube, Vimeo, Rumble, HighLevel-hosted, and direct MP4/WebM. Selected-media properties: alt, alignment (left / center / right / full-width), width, height, link-wrap, caption (figure / figcaption), drop shadow preset, rounded corners. Click-to-select for videos works for cross-origin iframes too.</li>
+          <li><strong>Supertab navigation.</strong> The Styles panel now groups everything under three brand-colored supertabs — Styles, Meta, Media — with sub-tabs filtered underneath. Easier to find what you need; less cramped at 300 px wide.</li>
+        </ul>
+      </div>
+
+      <div class="release-section">
+        <h3>⚙ Improvements</h3>
+        <ul>
+          <li><strong>Link dialog</strong> preserves button styling when you edit a link inside a styled element (the old behavior stripped it). Plain-language target picker — "Same tab" vs "New tab" — auto-adds <code>rel="noopener noreferrer"</code> for new-tab links.</li>
+          <li><strong>Split view</strong> got a draggable divider with double-click 50/50 reset, a brighter selection-sync highlight, and vertical centering for the source line when you click an element on the page side.</li>
+          <li><strong>"Don't refresh" warning pill</strong> in the header reminds you that a browser refresh discards unsaved work — backed by a browser-native prompt on close / reload.</li>
+          <li><strong>New-button safety buffer.</strong> Clicking <em>New</em> with content loaded now confirms before wiping.</li>
+          <li><strong>Brand palette swept</strong> across the editor — version badge, active toggles, and lingering stock-blue accents are now consistent with the Camille palette.</li>
+          <li><strong>Type Styles use <code>!important</code></strong> in the generated CSS so master typography wins the cascade against the page's own styles (especially useful with class-heavy HighLevel pages).</li>
+        </ul>
+      </div>
+
+      <div class="release-section">
+        <h3>🐛 Fixes</h3>
+        <ul>
+          <li>Split view: cursor in the source pane no longer jumps to the top of the page pane when typing.</li>
+          <li>Split view: the <em>New</em> button now resyncs both panes in lockstep (was leaving stale code on the source side).</li>
+          <li>Split divider drag no longer gets stuck when the mouse passes over the iframe.</li>
+          <li>Source pane: clicking an element in split view now vertically centers the matched code line instead of pushing it to the bottom edge.</li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- ============================ v1.2 ============================ -->
+    <article class="release minor">
+      <header class="release-header">
+        <div class="release-version">v1.2</div>
+        <div class="release-date">Early May 2026</div>
+      </header>
+
+      <p class="release-intro">Maintenance + polish.</p>
+
+      <div class="release-section">
+        <h3>🐛 Fixes</h3>
+        <ul>
+          <li><strong>Selection-state save bug</strong> — fixed a long-standing issue where Camille's internal selection-tracking artifacts could leak into the saved HTML, corrupting the cleanliness of the output. Saves are now reliably clean.</li>
+          <li>Misc. polish from early-release feedback.</li>
+        </ul>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer>
+  <div class="inner">
+    <div>© 2026 <a href="https://sypmedia.com">SYP Media LLC</a>. All rights reserved.</div>
+    <div>
+      <a href="https://app.camillehtml.com">Open Camille</a> ·
+      <a href="https://camillehtml.com/">Home</a> ·
+      <a href="https://camillehtml.com/userguide">User Guide</a> ·
+      <a href="https://camillehtml.com/#faq">FAQ</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

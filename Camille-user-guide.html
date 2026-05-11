@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camille User Guide — Free WYSIWYG HTML Editor</title>
+<meta name="description" content="Complete user guide for Camille — the free, browser-based WYSIWYG HTML editor for editing AI-generated web pages, HighLevel content blocks, and standalone HTML files.">
+<meta name="author" content="SYP Media LLC">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://camillehtml.com/userguide">
+
+<!-- Fraunces — display serif (variable: weight + SOFT axis) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,400..800,0..100&amp;display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* Brand palette */
+    --copper:        #7F5149;
+    --copper-soft:   #BF9F98;
+    --cream:         #F4EDEB;
+    --charcoal:      #3A3938;
+
+    /* Semantic tokens */
+    --bg: var(--cream);
+    --panel: #ffffff;
+    --border: #E5D7D1;
+    --text: var(--charcoal);
+    --muted: #7d6e68;
+    --accent: var(--copper);
+    --accent-hover: #6a3f38;
+    --accent-soft: #F0E1DC;
+
+    /* Type */
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    --radius: 10px;
+    --maxw: 1120px;
+    --maxw-content: 760px;
+
+    --shadow-sm: 0 1px 2px rgba(58,57,56,0.08);
+    --shadow: 0 1px 2px rgba(58,57,56,0.08), 0 4px 12px rgba(58,57,56,0.05);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); text-decoration: underline; }
+  img { max-width: 100%; height: auto; }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(180%) blur(8px);
+  }
+  .site-header .inner {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: center; }
+  .brand img { height: 60px; width: auto; max-width: 220px; display: block; }
+  .nav-links { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav-links a {
+    padding: 8px 12px; border-radius: 6px; font-size: 14px; color: var(--muted);
+  }
+  .nav-links a:hover { color: var(--accent); background: var(--accent-soft); text-decoration: none; }
+  .nav-cta {
+    background: var(--accent); color: #fff;
+    padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: 14px;
+    border: 1px solid var(--accent);
+  }
+  .nav-cta:hover { background: var(--accent-hover); color: #fff; text-decoration: none; }
+
+  /* ---------- Page hero ---------- */
+  .page-hero {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 24px 44px;
+  }
+  .page-hero .container { max-width: var(--maxw-content); margin: 0 auto; }
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 4px 10px; border-radius: 999px; margin-bottom: 16px;
+  }
+  .page-hero h1 {
+    font-family: var(--serif);
+    font-variation-settings: "SOFT" 30;
+    font-optical-sizing: auto;
+    font-size: 46px; font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin: 0 0 12px;
+    color: var(--charcoal);
+  }
+  .page-hero .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 19px; color: var(--muted);
+    margin: 0 0 22px;
+  }
+  .page-hero .lede { font-size: 17px; color: var(--text); margin: 0; }
+  .page-hero .live-callout {
+    margin-top: 28px;
+    padding: 14px 18px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .page-hero .live-callout a { font-weight: 600; }
+
+  /* ---------- Main content ---------- */
+  main { padding: 56px 24px 80px; }
+  main .container { max-width: var(--maxw-content); margin: 0 auto; }
+
+  main h2 {
+    font-family: var(--serif);
+    font-variation-settings: "SOFT" 30;
+    font-optical-sizing: auto;
+    font-size: 30px; font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 56px 0 18px;
+    color: var(--charcoal);
+  }
+  main h2:first-of-type { margin-top: 0; }
+  main h3 {
+    font-family: var(--serif);
+    font-variation-settings: "SOFT" 30;
+    font-optical-sizing: auto;
+    font-size: 20px; font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 32px 0 8px;
+    color: var(--charcoal);
+  }
+  main p { margin: 0 0 16px; font-size: 16px; }
+  main ul, main ol { margin: 0 0 18px; padding-left: 22px; }
+  main li { margin: 6px 0; font-size: 16px; }
+  main li > ul, main li > ol { margin: 8px 0 4px; }
+
+  main strong { color: var(--charcoal); font-weight: 600; }
+  main em { font-style: italic; }
+
+  main code {
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  main hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* ---------- Tables ---------- */
+  .table-wrap { overflow-x: auto; margin: 18px 0 24px; }
+  main table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-size: 15px;
+  }
+  main table th, main table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  main table thead th {
+    background: #faf5f3;
+    font-weight: 600;
+    color: var(--charcoal);
+    border-bottom: 2px solid var(--border);
+  }
+  main table tbody tr:last-child td { border-bottom: 0; }
+  main table td:first-child { font-weight: 600; color: var(--charcoal); }
+  main table tbody td code { font-size: 0.88em; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    padding: 28px 24px;
+    color: var(--muted); font-size: 13px;
+  }
+  footer .inner {
+    max-width: var(--maxw); margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--accent); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 880px) {
+    .page-hero { padding: 44px 20px 32px; }
+    .page-hero h1 { font-size: 34px; }
+    .page-hero .subtitle { font-size: 17px; }
+    main { padding: 40px 20px 60px; }
+    main h2 { font-size: 25px; margin-top: 44px; }
+    main h3 { font-size: 18px; }
+    .nav-links { display: none; }
+    main table { font-size: 14px; }
+    main table th, main table td { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================== HEADER ============================== -->
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="https://camillehtml.com/" aria-label="Camille — home">
+      <img src="https://assets.cdn.filesafe.space/e3LOYAHOBn0PFjgBHsPS/media/69fca6036f6342abb3a95d7f.webp" alt="Camille — Visual Composition for the AI-Built Web" class="">
+    </a>
+    <nav class="nav-links">
+      <a href="https://camillehtml.com/#problem">Why</a>
+      <a href="https://camillehtml.com/#features">Features</a>
+      <a href="https://camillehtml.com/#compare">Compare</a>
+      <a href="https://camillehtml.com/#faq">FAQ</a>
+      <a href="https://camillehtml.com/userguide" target="_blank">User Guide</a>
+      <a href="https://camillehtml.com/changelog" target="_blank">Changelog</a>
+    </nav>
+    <a class="nav-cta" href="https://app.camillehtml.com" target="_blank" rel="noopener">Open Camille →</a>
+  </div>
+</header>
+
+<!-- ============================== PAGE HERO ============================== -->
+<section class="page-hero">
+  <div class="container">
+    <span class="eyebrow">User Guide</span>
+    <h1>Camille v1.5 — User Guide</h1>
+    <p class="subtitle">Visual Composition for the AI-Built Web</p>
+    <p class="lede">A self-contained WYSIWYG HTML editor that runs in your browser. Single file, no installation, no server. Designed for editing content blocks (the kind you paste into HighLevel's Custom HTML element) and standalone HTML pages alike.</p>
+    <div class="live-callout">
+      Live at <a href="https://app.camillehtml.com" target="_blank" rel="noopener">app.camillehtml.com</a> · Copyright © 2026 SYP Media LLC. All rights reserved.
+    </div>
+  </div>
+</section>
+
+<!-- ============================== MAIN CONTENT ============================== -->
+<main>
+  <div class="container">
+
+    <h2>Quick start</h2>
+    <p>Visit <a href="https://app.camillehtml.com" target="_blank" rel="noopener"><strong>app.camillehtml.com</strong></a> in your browser, or open the local <code>index.html</code> file directly. Chrome and Edge have a few extra capabilities — see <a href="#browser-support">Browser support</a> at the end.</p>
+    <p>The welcome screen offers four ways to get started:</p>
+    <ul>
+      <li><strong>Open HTML File</strong> — pick a <code>.html</code> file from your computer</li>
+      <li><strong>Paste HTML</strong> — paste markup into a textbox (works for both fragments and full pages)</li>
+      <li><strong>Start Blank</strong> — begin with an empty document</li>
+      <li><strong>Drag and drop</strong> an HTML file onto the editor</li>
+    </ul>
+    <p>Once content is loaded, the welcome screen disappears and the toolbar comes alive.</p>
+
+    <hr>
+
+    <h2>What Camille is and isn't</h2>
+    <p>Camille is intentionally focused. Knowing where it shines (and where it doesn't) saves time.</p>
+    <p><strong>Camille is for standalone, AI-generated HTML.</strong> Clean, semantic, self-contained markup — the kind Claude, ChatGPT, Gemini, or a static-site generator produces. You drop the HTML into Camille, polish the typography, swap an image, fix a heading, save the file back. That's the sweet spot.</p>
+    <p><strong>Camille is not for CMS-instrumented markup.</strong> WordPress with Gutenberg block comments, HighLevel's page-builder <code>data-*</code> attribute scaffolding, Webflow's exported class soup — Camille won't preserve their round-trip semantics. You'll get a visual editor that works, but saving back into the CMS may break the builder. By design, not a limitation.</p>
+    <p>Two reasons to keep Camille open:</p>
+    <ul>
+      <li><strong>Human touch.</strong> The last 10% that takes an AI-generated page from "good draft" to "actually finished" — picking the right font pairing, balancing colors, tightening a heading, captioning the hero image. AI gives you 90% in thirty seconds. Camille gives you the final 10% without another regeneration.</li>
+      <li><strong>Direct manipulation beats prompting</strong> for small tasks. Sometimes explaining a change to an AI takes longer than just making the change yourself — if you have the right tool in front of you.</li>
+    </ul>
+
+    <hr>
+
+    <h2>The three view modes</h2>
+    <p>A segmented control near the top right (<strong>Page · Source · Split</strong>) lets you switch between three ways of looking at and editing your document.</p>
+
+    <h3>Page view</h3>
+    <p>Pure visual editing. Click anywhere in the document and start typing. Highlight text and use the formatting toolbar above (Bold, Italic, headings, lists, links, etc.). Click an image to bring up its contextual toolbar. Click any other element to update the Element Styles panel.</p>
+
+    <h3>Source view</h3>
+    <p>Pure code editing. The whole pane shows your raw HTML in a dark Dracula theme with line numbers, syntax highlighting, auto-close tags, and bracket matching.</p>
+    <ul>
+      <li><strong>Ctrl/Cmd+F</strong> — find (with a regex toggle)</li>
+      <li><strong>Ctrl+H</strong> or <strong>Cmd+Alt+F</strong> — find and replace</li>
+      <li>A <strong>Wrap</strong> button appears in the header when source is showing — toggle whether long lines wrap visually (your file content is unchanged either way)</li>
+    </ul>
+
+    <h3>Split view</h3>
+    <p>Source on the left, live preview on the right — fully editable on both sides. Type in the source pane and the preview updates 500ms after you stop. Edit visually in the preview and the source updates 600ms after you stop. Whichever pane has focus is the "driver" — the other side won't override your cursor while you're working.</p>
+    <p><strong>Click-to-locate</strong>: clicking any element in the preview pane scrolls the source pane to the corresponding line and highlights it. Useful for finding "where is <em>this</em> in the code?"</p>
+
+    <hr>
+
+    <h2>Header buttons</h2>
+    <p>Left to right across the header:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Button</th><th>What it does</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Open File</td><td>File picker for a local HTML file</td></tr>
+          <tr><td>Paste HTML</td><td>Modal for pasting markup</td></tr>
+          <tr><td>New</td><td>Start with a blank document</td></tr>
+          <tr><td>Page / Source / Split</td><td>View mode (segmented control)</td></tr>
+          <tr><td>Wrap</td><td>Toggle source line wrapping (visible only when source is showing)</td></tr>
+          <tr><td>Wide</td><td>Toggle wide preview for fragments (visible only for fragments)</td></tr>
+          <tr><td>Styles</td><td>Show/hide Element Styles panel</td></tr>
+          <tr><td>Copy HTML</td><td>Copy current document to clipboard</td></tr>
+          <tr><td>Save</td><td>Save to disk (overwrite linked file, or download)</td></tr>
+          <tr><td>Save As</td><td>Save to a new file (native dialog or filename prompt)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr>
+
+    <h2>Formatting toolbar (Page mode)</h2>
+    <p>The second row in Page and Split modes has standard text-editor controls:</p>
+    <ul>
+      <li><strong>Block format dropdown</strong> — Paragraph, Heading 1–4, Quote, Code Block. Applies to whichever paragraph the cursor is in.</li>
+      <li><strong>B / I / U / S</strong> — Bold, Italic, Underline, Strikethrough on selected text. Keyboard: Ctrl+B, Ctrl+I, Ctrl+U.</li>
+      <li><strong>• List / 1. List</strong> — bulleted and numbered lists for selected paragraphs.</li>
+      <li><strong>← / →</strong> — outdent / indent (decrease and increase list level).</li>
+      <li><strong>Align icons</strong> — left, center, right alignment for the current paragraph.</li>
+      <li><strong>Link</strong> — prompt for a URL; if text is selected, wraps it in <code>&lt;a href&gt;</code>. If you have an existing link selected, the prompt pre-fills with its current URL.</li>
+      <li><strong>Unlink</strong> — remove the link wrapping the current selection.</li>
+      <li><strong>Clear</strong> — strip formatting from the selection.</li>
+      <li><strong>Undo / Redo</strong> — Ctrl+Z / Ctrl+Shift+Z.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Editing images</h2>
+    <p>Click any image in Page or Split mode. A floating toolbar appears just above it with these controls:</p>
+    <ul>
+      <li><strong>W: [number] px</strong> — change the image width in pixels. Aspect ratio is preserved automatically.</li>
+      <li><strong>Resize handle</strong> — a blue circle at the bottom-right corner of the image. Drag to resize.</li>
+      <li><strong>Left / Center / Right / Inline</strong> — alignment / float behavior:
+        <ul>
+          <li><em>Left</em>: floats left, text wraps to the right</li>
+          <li><em>Right</em>: floats right, text wraps to the left</li>
+          <li><em>Center</em>: centers on its own line</li>
+          <li><em>Inline</em>: no float, flows with surrounding text</li>
+        </ul>
+      </li>
+      <li><strong>URL</strong> — prompt to view or change the image source URL</li>
+      <li><strong>Alt</strong> — prompt to view or change the alt text (for screen readers and SEO)</li>
+      <li><strong>Delete</strong> — remove the image</li>
+    </ul>
+    <p>Click anywhere outside the image, or press <strong>Esc</strong>, to deselect.</p>
+    <p>The selection outline and resize handle are stripped on Save / Copy — they never end up in your exported HTML.</p>
+
+    <hr>
+
+    <h2>Element Styles panel</h2>
+    <p>Click the <strong>Styles</strong> button in the header to open a 300-pixel panel on the right. As of v1.5, the panel is organized into three brand-colored <strong>supertabs</strong> across the top:</p>
+    <ul>
+      <li><strong>Styles</strong> — Element (per-element controls described below) and Type Styles (page-wide typography).</li>
+      <li><strong>Meta</strong> — Metadata (title, description, hero image, social-share preview) and Tracking (analytics + pixel codes).</li>
+      <li><strong>Media</strong> — paste-URL image and video insertion, plus properties for the selected media.</li>
+    </ul>
+    <p>The Element sub-tab is the per-element editor described in this section. Click any element in the editor and the panel updates with controls for that element.</p>
+
+    <h3>Selected element breadcrumb</h3>
+    <p>Shows the full ancestor chain (e.g. <code>body › section.dtd-hero › div.dtd-container › h1</code>). Each segment is clickable — click an ancestor to "select up the tree." Useful when you've clicked a child but want to style its container.</p>
+
+    <h3>Background</h3>
+    <p>A native color picker, a hex text field, and a × clear button. Behavior depends on whether you have text selected:</p>
+    <ul>
+      <li><strong>No text selection</strong> → applies as inline <code>background-color</code> on the selected element</li>
+      <li><strong>Text selected</strong> → highlights just that text via <code>execCommand('hiliteColor')</code> (like a marker)</li>
+    </ul>
+
+    <h3>Text color</h3>
+    <p>Same three controls. With no text selection, applies to the whole element. With text selected, applies to just the selected text via <code>execCommand('foreColor')</code> — a <code>&lt;span style="color: ..."&gt;</code> wraps the selection.</p>
+    <p>The section labels show a hint (<code>→ entire element</code> vs <code>→ selected text only</code>) so you always know which behavior is active.</p>
+
+    <h3>Opacity</h3>
+    <p>Slider from 0–100%. Applies as inline <code>opacity</code> on the selected element.</p>
+
+    <h3>Background image</h3>
+    <p>Auto-detects whether the selected element has a background image.</p>
+    <p>If not, shows a "+ Add background image" button. Click it, paste a URL, and the editor sets sensible defaults (cover size, center position, no-repeat).</p>
+    <p>If yes, shows:</p>
+    <ul>
+      <li>A <strong>preview thumbnail</strong> of the image</li>
+      <li>An <strong>editable URL field</strong> with × to clear (clearing also removes related size/position/repeat/attachment styles)</li>
+      <li><strong>Size</strong> — auto / cover / contain / stretch (<code>100% 100%</code>)</li>
+      <li><strong>Position</strong> — center, top, bottom, four corners</li>
+      <li><strong>Repeat</strong> — repeat / no-repeat / repeat-x / repeat-y</li>
+      <li><strong>Attachment</strong> — scroll / <strong>fixed (parallax)</strong> / local</li>
+    </ul>
+    <p>Setting Attachment to <em>fixed</em> gives a parallax effect — the background stays still while content scrolls over it.</p>
+
+    <h3>Page palette</h3>
+    <p>Auto-extracted color swatches from the page. Two sources feed it:</p>
+    <ul>
+      <li>Every visible element's computed <code>color</code>, <code>background-color</code>, and border colors</li>
+      <li>Every CSS custom property in the page's stylesheets (e.g. <code>--dtd-blue: #005FAF</code>)</li>
+    </ul>
+    <p>Each swatch supports three actions:</p>
+    <ul>
+      <li><strong>Click</strong> the swatch — copies its hex to your clipboard</li>
+      <li><strong>Hover</strong> the swatch — two micro-buttons appear at the bottom: <strong>BG</strong> applies it as the selected element's background, <strong>Txt</strong> applies it as text color</li>
+      <li><strong>Rescan</strong> button (top-right of the section) — re-extract colors after major edits</li>
+    </ul>
+
+    <hr>
+
+    <h2>Type Styles panel</h2>
+    <p>The Type Styles sub-tab (under the Styles supertab) manages page-wide typography from one place. Everything you set here writes a <code>&lt;style&gt;</code> block into your HTML that travels with the saved file.</p>
+
+    <h3>Master controls</h3>
+    <p>Pinned at the top of the tab:</p>
+    <ul>
+      <li><strong>Headline Font</strong> — applies to all H1&ndash;H6.</li>
+      <li><strong>Content Font</strong> — applies to body text, paragraphs, lists.</li>
+      <li><strong>Text color</strong> — page-wide default text color.</li>
+      <li><strong>Link color</strong> — color for hyperlinks.</li>
+    </ul>
+    <p>Click either font button to open the custom font picker — forty curated Google Fonts each previewed in their own typeface, plus an <em>Other</em> field for any Google Font outside the curated set, plus a link out to fonts.google.com for browsing. Picking a font also injects the right Google Fonts <code>&lt;link&gt;</code> tag so it actually renders on the page.</p>
+
+    <h3>Per-element overrides</h3>
+    <p>Below the master controls, thirteen collapsible rows for individual typographic roles: H1&ndash;H6, paragraph, lists, hyperlink (default + in heading + in list), blockquote, preformatted / code. Each row shows what it inherits from master (e.g. <em>&ldquo;&#x21B3; Lobster&rdquo;</em>) until you set explicit values. Per-row controls: font family, color, font size, font weight, line height.</p>
+    <p>The generated CSS uses <code>!important</code> so your typography wins the cascade against the page's existing styles &mdash; especially useful with class-heavy HighLevel pages where their own CSS would otherwise outrank generic <code>h1</code> selectors.</p>
+
+    <h3>Export and import a typography spec</h3>
+    <p>Three buttons at the bottom of the tab:</p>
+    <ul>
+      <li><strong>Export Spec</strong> &mdash; opens a modal with three format tabs:
+        <ul>
+          <li><em>CSS</em> &mdash; drop-in stylesheet with <code>:root</code> custom properties + element selectors. Apply on any HTML page.</li>
+          <li><em>JSON</em> &mdash; structured spec for programmatic AI tools (Cursor, v0, Lovable).</li>
+          <li><em>Brief</em> &mdash; natural-language description for prompting Claude, ChatGPT, or Gemini.</li>
+        </ul>
+        If you click Export without having set any styles, Camille snapshots the current page's rendered typography so you can capture and reuse what's already there.
+      </li>
+      <li><strong>Import Spec</strong> &mdash; paste a spec, drag-and-drop a <code>.css</code> / <code>.json</code> / <code>.txt</code> file, or use the file picker. CSS and JSON round-trip cleanly; the brief format is export-only.</li>
+      <li><strong>Clear</strong> &mdash; removes all type styles (master + per-element) from the page after a confirm.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Metadata + Schema panel</h2>
+    <p>Under the <strong>Meta</strong> supertab. A quick-view in the sidebar shows the current state; <em>Edit metadata</em> opens the full editor modal.</p>
+
+    <h3>Page metadata</h3>
+    <p>Single-source: fill each field once, Camille emits standard <code>&lt;meta&gt;</code>, Open Graph, and Twitter Card tags from the same inputs.</p>
+    <ul>
+      <li><strong>Page title</strong> &mdash; the tab title and search-result headline. Live character counter (target ~60).</li>
+      <li><strong>Description</strong> &mdash; search and social-share summary. Live counter (target 150&ndash;160).</li>
+      <li><strong>Hero / cover image URL</strong> &mdash; drives <code>og:image</code> and the Twitter card image.</li>
+      <li>Advanced (collapsed): keywords, canonical URL, author, robots directive.</li>
+    </ul>
+    <p>An inline social-share preview card on the right updates live as you type &mdash; close to how Facebook, LinkedIn, and iMessage will render the page when shared. There's also a <em>Validate on metatags.io</em> external link for deeper cross-platform checking.</p>
+    <p>For HTML fragments (no <code>&lt;head&gt;</code>), Camille stores the metadata in a <code>&lt;!--CAMILLE_META:&hellip;--&gt;</code> comment at the top of the block so it persists across sessions. Use <em>Copy snippet</em> in the modal to grab a paste-ready <code>&lt;head&gt;</code> block for the host page.</p>
+
+    <h3>Schema markup</h3>
+    <p>Camille detects existing <code>&lt;script type="application/ld+json"&gt;</code> blocks on the page and surfaces them in the Schema sub-tab. For each block: view the JSON, edit it as raw text, toggle the block active / inactive, or remove it.</p>
+    <p>Four templates for adding new schema blocks: <strong>Article</strong>, <strong>Organization</strong>, <strong>FAQPage</strong>, <strong>LocalBusiness</strong>. Pick a type, fill in the placeholders. A <em>send to AI</em> button copies your schema plus a pre-written prompt to your clipboard so you can paste into Claude / ChatGPT / Gemini and ask for help completing it. An external link to <strong>Google Rich Results Test</strong> lets you validate the markup.</p>
+
+    <hr>
+
+    <h2>Tracking Codes panel</h2>
+    <p>Also under the <strong>Meta</strong> supertab. Camille knows eight tracker types out of the box:</p>
+    <ul>
+      <li>Google Analytics 4</li>
+      <li>Google Tag Manager</li>
+      <li>Meta Pixel</li>
+      <li>TikTok Pixel</li>
+      <li>LinkedIn Insight Tag</li>
+      <li>HighLevel External Tracking</li>
+      <li>Microsoft Clarity</li>
+      <li>Hotjar</li>
+    </ul>
+    <p>For each, Camille detects the script pattern on the page, extracts the ID, and lets you edit just that ID without disturbing the surrounding code &mdash; so any custom additions (extra <code>gtag('event', &hellip;)</code> calls, etc.) are preserved.</p>
+
+    <h3>Add a tracker</h3>
+    <p>Click any of the eight platform buttons in the modal's <em>Add a tracker</em> section. An inline form asks for your ID; on submit, Camille inserts the canonical vendor snippet into <code>&lt;head&gt;</code> (or top of body for fragments).</p>
+
+    <h3>Other scripts</h3>
+    <p>Any <code>&lt;script&gt;</code> on the page that doesn't match a known tracker pattern appears in the <em>Other scripts</em> section as raw editable code (or a Locate-only entry for external scripts with a <code>src</code>). Useful for catching custom scripts you've added &mdash; A/B testing tools, CRM widgets, your own JS.</p>
+
+    <h3>Locate-in-source</h3>
+    <p>Each tracker row has a <strong>Locate</strong> button. Clicking it switches to Split view (if you're not already there) and highlights the script's line in the source pane.</p>
+
+    <p><em>Note on the editor preview:</em> trackers you add are inserted as real <code>&lt;script&gt;</code> tags in the iframe and may fire from the editor's URL. Most analytics platforms reject hits from <code>file://</code> origins, so this is usually a no-op while editing locally. When the saved page is hosted on a real domain, the trackers fire normally.</p>
+
+    <hr>
+
+    <h2>Media panel</h2>
+    <p>The third supertab. Camille's <em>insert media by URL</em> tab.</p>
+
+    <h3>Insert image</h3>
+    <p>Paste an image URL, click <strong>Insert</strong> (or press Enter). The image lands at the cursor position as an <code>&lt;img&gt;</code> tag.</p>
+
+    <h3>Insert video</h3>
+    <p>Paste a video URL. Camille auto-detects the source as you type &mdash; a green "Detected: YouTube / Vimeo / Rumble / HL hosted / Self-hosted MP4&middot;WebM" hint appears. Click <strong>Insert</strong> to drop in the right embed:</p>
+    <ul>
+      <li><strong>YouTube</strong>, <strong>Vimeo</strong>, <strong>Rumble</strong>, and <strong>HighLevel-hosted</strong> &mdash; <code>&lt;iframe&gt;</code> embeds.</li>
+      <li><strong>MP4 / WebM</strong> &mdash; native <code>&lt;video controls&gt;</code> tag.</li>
+    </ul>
+    <p>Some YouTube videos won't play inside the editor preview because of the video owner's embed settings (YouTube "Error 153" etc.). They'll work normally on the saved page once hosted on a real domain.</p>
+
+    <h3>Selected media properties</h3>
+    <p>Click an image or video in the editor and a properties section appears in the Media panel:</p>
+    <ul>
+      <li><strong>Common</strong> (image + video): alignment (Left / Center / Right / Full-width), width and height in pixels, Delete media.</li>
+      <li><strong>Image-only</strong>: alt text, link-to URL (wraps the image in <code>&lt;a&gt;</code>), caption (wraps in <code>&lt;figure&gt;</code> with <code>&lt;figcaption&gt;</code>), drop-shadow preset (None / Subtle / Pronounced), and a rounded-corners slider (0&ndash;32&nbsp;px).</li>
+      <li><strong>Video-only</strong>: the original source URL appears in the Insert Video field and the button flips to <em>Update</em> &mdash; edit the URL and click Update to swap the embed in place.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Saving your work</h2>
+    <p>Camille has two save modes:</p>
+
+    <h3>Save (Ctrl+S)</h3>
+    <p>If you've previously used <strong>Save As</strong> to point at a real file, <strong>Save</strong> overwrites that file directly — no dialog, no Downloads folder. Like a desktop app.</p>
+    <p>If you haven't, <strong>Save</strong> falls back to downloading a copy to your browser's Downloads folder, using the current filename.</p>
+
+    <h3>Save As (Ctrl+Shift+S)</h3>
+    <p>In Chrome / Edge / Brave / Opera / Arc, opens the native Save dialog where you pick the folder and filename. After saving, the editor remembers that file — future Saves overwrite it directly.</p>
+    <p>In Firefox / Safari, falls back to a filename prompt followed by a download (browser settings determine the location).</p>
+
+    <h3>When the file link breaks</h3>
+    <p>Opening a different file via <strong>Open File</strong> clears the remembered file handle. This prevents accidentally overwriting File A when you've moved on to editing File B. After opening the new file, use <strong>Save As</strong> again to link it.</p>
+
+    <h3>Browser may ask for permission</h3>
+    <p>The first time you Save after a Save As, Chrome may show "Allow this site to edit the file?" — say yes once and it'll remember for the session.</p>
+
+    <hr>
+
+    <h2>Common workflows</h2>
+
+    <h3>Editing a HighLevel content block</h3>
+    <ol>
+      <li>In HighLevel, open the Custom HTML element and copy its HTML.</li>
+      <li>In Camille, click <strong>Paste HTML</strong>, paste, click <strong>Load</strong>.</li>
+      <li>Edit visually in Page mode (or in Source mode for fine control).</li>
+      <li>Click <strong>Copy HTML</strong> to get the cleaned-up output.</li>
+      <li>Paste back into HighLevel's Custom HTML field. Save in HighLevel.</li>
+    </ol>
+    <p>The Wide toggle is handy here — content blocks are typically full-width in HighLevel but Camille shows them in a 880-pixel reading column by default. Toggle Wide to preview them edge-to-edge.</p>
+
+    <h3>Editing a local HTML file</h3>
+    <ol>
+      <li><strong>Open File</strong> → pick the file. Encoding is auto-detected.</li>
+      <li>Edit.</li>
+      <li><strong>Save As</strong> the first time — pick the location and filename (overwrite the original or save a copy).</li>
+      <li><strong>Ctrl+S</strong> for subsequent saves — overwrites the linked file directly.</li>
+    </ol>
+
+    <hr>
+
+    <h2>Keyboard shortcuts</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Shortcut</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ctrl+S</td><td>Save</td></tr>
+          <tr><td>Ctrl+Shift+S</td><td>Save As</td></tr>
+          <tr><td>Ctrl+B / Ctrl+I / Ctrl+U</td><td>Bold / Italic / Underline (Page mode)</td></tr>
+          <tr><td>Ctrl+Z / Ctrl+Shift+Z</td><td>Undo / Redo</td></tr>
+          <tr><td>Ctrl+F</td><td>Find (Source mode)</td></tr>
+          <tr><td>Ctrl+H</td><td>Find &amp; Replace (Source mode)</td></tr>
+          <tr><td>Esc</td><td>Close paste modal / deselect image</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><em>(On Mac, use Cmd in place of Ctrl.)</em></p>
+
+    <hr>
+
+    <h2>File compatibility</h2>
+
+    <h3>Encoding</h3>
+    <p>Camille auto-detects file encoding when you open:</p>
+    <ul>
+      <li><strong>BOM markers</strong> (UTF-8, UTF-16 LE/BE) — used directly</li>
+      <li><strong><code>&lt;meta charset&gt;</code> declaration</strong> in the file — read and used</li>
+      <li>Otherwise, tries strict UTF-8. If that fails, falls back to <strong>Windows-1252</strong> (covers most legacy HTML, Word/Outlook exports, older HighLevel files)</li>
+    </ul>
+    <p>A toast confirms when a non-UTF-8 encoding was detected. <strong>All files are saved as UTF-8</strong> with a <code>&lt;meta charset="UTF-8"&gt;</code> written into the head, so re-saving an old Windows-1252 file modernizes it.</p>
+    <p>If you see a <code>�</code> (replacement) character on a published page, the original byte was already destroyed before Camille got it. Re-load the original source file with Camille's auto-detection and the smart punctuation will come back. If you don't have an unmodified original, edit the <code>�</code>s manually in source view.</p>
+
+    <h3>Fragments vs full pages</h3>
+    <p>Camille distinguishes between:</p>
+    <ul>
+      <li><strong>Full pages</strong> — files that contain <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, and <code>&lt;body&gt;</code>. Rendered as-is.</li>
+      <li><strong>Fragments</strong> — content blocks like <code>&lt;div class="hero"&gt;...&lt;/div&gt;</code>. Wrapped in a synthetic page with editor-friendly default styles for preview only — never written to your saved file.</li>
+    </ul>
+    <p>The distinction is automatic. The Wide toggle only affects fragments.</p>
+
+    <hr>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>The <strong>Background image inspector</strong> edits only the first image of a layered (comma-separated) <code>background-image</code>. Multi-layer designs need source view.</li>
+      <li><strong>Tables</strong>: no Insert Table UI yet. Pasted/loaded tables render and can be edited cell-by-cell, but there's no rows/columns picker.</li>
+      <li><strong>Email-specific HTML</strong> (mso-* properties, conditional comments) renders best-effort but the editor isn't an Outlook simulator.</li>
+      <li><strong>Element selection in Split mode</strong> can land on a styling <code>&lt;span&gt;</code> if you previously colored some text — use the breadcrumb to navigate up to the parent element.</li>
+    </ul>
+
+    <hr>
+
+    <h2 id="browser-support">Browser support</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>Chrome/Edge/Brave/Arc</th><th>Firefox</th><th>Safari</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Core editing</td><td>yes</td><td>yes</td><td>yes</td></tr>
+          <tr><td>Source view (CodeMirror)</td><td>yes</td><td>yes</td><td>yes</td></tr>
+          <tr><td>Native Save dialog</td><td>yes</td><td>fallback to prompt+download</td><td>fallback to prompt+download</td></tr>
+          <tr><td>Auto-close tags</td><td>yes</td><td>yes</td><td>yes</td></tr>
+          <tr><td>Find &amp; replace</td><td>yes</td><td>yes</td><td>yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The "fallback" cells use a <code>prompt()</code> for filename and trigger a download — works fine, just less app-like.</p>
+
+    <hr>
+
+    <h2>What's coming next</h2>
+    <p>On deck for v1.6+:</p>
+    <ul>
+      <li><strong>Color overlay</strong> for hero images &mdash; wrap an <code>&lt;img&gt;</code> in a <code>&lt;div&gt;</code> with an absolute-positioned overlay layer so you can do hero-with-text patterns directly from the Media panel.</li>
+      <li><strong>Visual find &amp; replace</strong> that works against Page view, not just the Source pane.</li>
+      <li><strong>Padding / margin / border controls</strong> in the Element sub-tab.</li>
+      <li><strong>Responsive preview</strong> &mdash; drag handle to test mobile / tablet widths without leaving the editor.</li>
+      <li><strong>Insert Table</strong> button with a rows / columns picker.</li>
+      <li><strong>Deselect-all button</strong> to clear the current element/text selection without clicking into whitespace.</li>
+      <li>Architectural overhaul of selection-state tracking for cleaner saves under edge cases.</li>
+    </ul>
+    <p>See the <a href="https://camillehtml.com/changelog">changelog</a> for everything that's shipped so far.</p>
+
+  </div>
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer>
+  <div class="inner">
+    <div>© 2026 <a href="https://sypmedia.com">SYP Media LLC</a>. All rights reserved.</div>
+    <div>
+      <a href="https://app.camillehtml.com">Open Camille</a> ·
+      <a href="https://camillehtml.com/">Home</a> ·
+      <a href="https://camillehtml.com/changelog">Changelog</a> ·
+      <a href="https://camillehtml.com/#faq">FAQ</a>
+    </div>
+  </div>
+</footer>
+
+
+</body></html>

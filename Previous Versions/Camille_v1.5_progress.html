@@ -1,0 +1,3858 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  Camille — Visual Composition for the AI-Built Web
+  Version 1.5
+  https://app.camillehtml.com
+
+  Copyright © 2026 SYP Media LLC. All rights reserved.
+  ============================================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camille — Visual Composition for the AI-Built Web</title>
+<meta name="description" content="A self-contained WYSIWYG HTML editor for visual composition of web content blocks. By SYP Media LLC.">
+<meta name="author" content="SYP Media LLC">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --border: #e2e5ea;
+    --text: #1f2328;
+    --muted: #6a737d;
+    --accent: #7F5149;
+    --accent-hover: #6a3f38;
+    --danger: #d1242f;
+    --success: #1a7f37;
+    --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+  }
+  body {
+    display: flex; flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  header h1 .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+  }
+  header h1 .version {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: #F4EDEB;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+  }
+  header h1 .separator {
+    color: var(--border);
+    font-weight: 300;
+    margin: 0 8px;
+    font-size: 16px;
+  }
+  header h1 .tagline {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    margin-right: 10px;
+  }
+  header .help-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+  }
+  header .help-link:hover {
+    color: var(--accent);
+    background: #f0f2f5;
+    border-color: var(--border);
+  }
+  header .filename {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 400;
+    margin-left: 4px;
+  }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button, label.btn {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.12s, border-color 0.12s;
+    user-select: none;
+  }
+  button:hover, label.btn:hover { background: #f0f2f5; border-color: #d1d5db; }
+  button:active, label.btn:active { background: #e6e9ee; }
+  button.primary, label.btn.primary {
+    background: var(--accent); color: white; border-color: var(--accent);
+  }
+  button.primary:hover, label.btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  button.icon-only { padding: 6px 8px; min-width: 32px; justify-content: center; }
+  button.toggle.active { background: #F4EDEB; border-color: #BF9F98; color: var(--accent); }
+
+  #toolbar {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex; gap: 4px; flex-wrap: wrap; align-items: center;
+  }
+  #toolbar .group {
+    display: flex; gap: 2px;
+    padding-right: 8px; margin-right: 4px;
+    border-right: 1px solid var(--border);
+  }
+  #toolbar .group:last-child { border-right: none; margin-right: 0; }
+  #toolbar button {
+    padding: 5px 10px;
+    min-width: 30px;
+    background: transparent;
+    border: 1px solid transparent;
+  }
+  #toolbar button:hover { background: #f0f2f5; border-color: var(--border); }
+  #toolbar button.active { background: #e0e7ff; border-color: #b9c5f0; color: #1e40af; }
+  #toolbar select {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 8px;
+    background: var(--panel);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+  #editor-frame {
+    flex: 1;
+    border: none;
+    background: white;
+    width: 100%;
+    height: 100%;
+  }
+  #source-view {
+    display: none; /* hidden — CodeMirror takes over */
+  }
+  .CodeMirror {
+    display: none;
+    flex: 1;
+    height: auto !important;
+    width: 100%;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+  }
+  .CodeMirror-gutters { border-right: 1px solid #2a2a2a !important; }
+  /* Selection-follow highlight in source pane (v1.5: brighter for visibility — Item 2B) */
+  .cw-source-active {
+    background: rgba(255, 213, 80, 0.32) !important;
+    box-shadow: inset 3px 0 0 #ffd550 !important;
+  }
+  .cw-source-active-gutter {
+    color: #ffd550 !important;
+    font-weight: 700;
+    background: rgba(255, 213, 80, 0.15) !important;
+  }
+
+  /* Segmented view-mode group */
+  .view-group { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .view-group .view-btn { border-radius: 0; border: none; border-right: 1px solid var(--border); }
+  .view-group .view-btn:last-child { border-right: none; }
+  .view-group .view-btn.active { background: #e0e7ff; border-color: #b9c5f0; color: #1e40af; }
+
+  /* Three view modes */
+  body.view-page #editor-frame { display: block; }
+  body.view-page .CodeMirror { display: none; }
+  body.view-source #editor-frame { display: none; }
+  body.view-source .CodeMirror { display: block; }
+  /* Split-view sizing — driven by --split-left / --split-right CSS variables so the
+     draggable divider can resize the panes without overriding non-split layouts. */
+  body.view-split #editor-frame { display: block; flex: 0 1 var(--split-left, 50%); min-width: 0; }
+  body.view-split .CodeMirror { display: block; flex: 0 1 var(--split-right, 50%); min-width: 0; border-right: 1px solid var(--border); }
+
+  /* Split-view draggable divider (v1.5, Item 2C) */
+  #split-divider {
+    display: none;
+    width: 6px;
+    flex: 0 0 6px;
+    background: var(--border);
+    cursor: col-resize;
+    user-select: none;
+    position: relative;
+    transition: background 0.15s;
+  }
+  body.view-split #split-divider { display: block; }
+  #split-divider:hover, #split-divider.dragging { background: var(--accent); }
+  #split-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px; height: 32px;
+    background: rgba(0,0,0,0.28);
+    border-radius: 1px;
+    transition: background 0.15s;
+  }
+  #split-divider:hover::before, #split-divider.dragging::before { background: white; }
+  /* Discoverability tooltip — appears after a brief hover, hides during drag */
+  #split-divider::after {
+    content: 'Drag to resize • Double-click for 50/50';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, calc(-50% - 36px));
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 500;
+    background: #1f2328;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 10;
+  }
+  #split-divider:hover::after { opacity: 1; transition-delay: 0.5s; }
+  #split-divider.dragging::after { opacity: 0; transition-delay: 0s; }
+
+  /* Refresh warning indicator (v1.5) — sits in the header next to Open File.
+     Reminds users that refreshing/closing the tab without saving loses work. */
+  #refresh-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    color: #92400e;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: help;
+    position: relative;
+    user-select: none;
+  }
+  #refresh-warning:hover { background: #fde68a; }
+  #refresh-warning .warn-icon { font-size: 14px; line-height: 1; }
+  #refresh-warning .warn-tooltip {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 280px;
+    padding: 10px 12px;
+    background: #1f2328;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    z-index: 200;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #refresh-warning .warn-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px; left: 16px;
+    width: 10px; height: 10px;
+    background: #1f2328;
+    transform: rotate(45deg);
+  }
+  #refresh-warning:hover .warn-tooltip,
+  #refresh-warning:focus .warn-tooltip,
+  #refresh-warning:focus-within .warn-tooltip { display: block; }
+  #refresh-warning .warn-tooltip strong { color: #fbbf24; }
+  #refresh-warning .warn-tooltip em {
+    font-style: normal;
+    font-weight: 600;
+    color: white;
+    background: rgba(255,255,255,0.14);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* Wrap toggle visible only when source is showing */
+  #wrap-toggle { display: none; }
+  body.view-source #wrap-toggle, body.view-split #wrap-toggle { display: inline-flex; }
+  /* Wide toggle visible only when a fragment is loaded (full pages already render edge-to-edge) */
+  #wide-toggle { display: none; }
+  body.is-fragment #wide-toggle { display: inline-flex; }
+
+  #welcome {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px;
+    text-align: center;
+  }
+  #welcome.hidden { display: none; }
+  #welcome h2 { font-size: 22px; margin: 0 0 8px; }
+  #welcome p { color: var(--muted); margin: 0 0 24px; max-width: 480px; line-height: 1.5; }
+  #welcome .welcome-logo {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 0 auto 4px;
+  }
+  #welcome .welcome-version {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin: 0 0 22px;
+    font-weight: 600;
+  }
+  #welcome .welcome-footer {
+    position: absolute;
+    bottom: 16px; left: 0; right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  #welcome .welcome-footer a { color: var(--muted); text-decoration: none; }
+  #welcome .welcome-footer a:hover { color: var(--accent); }
+  #welcome .actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 24px; }
+  #welcome .actions button, #welcome .actions label.btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  #drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 32px 48px;
+    color: var(--muted);
+    background: var(--panel);
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+    max-width: 520px;
+  }
+  #drop-zone.dragover {
+    border-color: var(--accent);
+    background: #eff5ff;
+    color: var(--accent);
+  }
+
+  #paste-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  #paste-modal.show { display: flex; }
+  #paste-modal .box {
+    background: var(--panel);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 90%; max-width: 700px;
+    padding: 20px;
+    display: flex; flex-direction: column;
+    gap: 12px;
+  }
+  #paste-modal h3 { margin: 0; font-size: 16px; }
+  #paste-modal textarea {
+    width: 100%; height: 320px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 13px;
+    resize: vertical;
+    outline: none;
+  }
+  #paste-modal textarea:focus { border-color: var(--accent); }
+  #paste-modal .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  /* Link dialog (v1.5, Items 1a + 1b) — replaces the old prompt() so we can preserve
+     element styling and offer a target picker. Shares paste-modal's overlay treatment. */
+  #link-modal {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  #link-modal.show { display: flex; }
+  #link-modal .box {
+    background: var(--panel);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    width: 90%; max-width: 480px;
+    padding: 20px;
+    display: flex; flex-direction: column;
+    gap: 14px;
+  }
+  #link-modal h3 { margin: 0; font-size: 16px; }
+  #link-modal .link-field { display: flex; flex-direction: column; gap: 4px; }
+  #link-modal .link-field span {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  #link-modal .link-field input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    outline: none;
+  }
+  #link-modal .link-field input[type="text"]:focus { border-color: var(--accent); }
+  #link-modal .link-target {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px 10px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  #link-modal .link-target legend {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 0 4px;
+  }
+  #link-modal .link-target label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 2px 0;
+  }
+  #link-modal .link-hint {
+    margin: -4px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  #link-modal .modal-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  #link-modal #link-remove {
+    color: var(--danger);
+    border-color: transparent;
+  }
+  #link-modal #link-remove:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1f2328;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    font-size: 13px;
+    z-index: 200;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  #toast.success { background: var(--success); }
+  #toast.error { background: var(--danger); }
+
+  input[type="file"] { display: none; }
+  .hint { color: var(--muted); font-size: 12px; }
+
+  #image-toolbar {
+    position: fixed;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 8px;
+    display: none;
+    gap: 4px;
+    align-items: center;
+    box-shadow: var(--shadow);
+    z-index: 50;
+    font-size: 12px;
+  }
+  #image-toolbar.show { display: flex; }
+  #image-toolbar label {
+    display: inline-flex; align-items: center; gap: 4px;
+    color: var(--muted);
+  }
+  #image-toolbar input[type="number"] {
+    width: 64px; padding: 3px 6px;
+    border: 1px solid var(--border); border-radius: 4px;
+    font-size: 12px;
+  }
+  #image-toolbar button {
+    padding: 4px 10px;
+    font-size: 12px;
+    min-width: auto;
+  }
+  #image-toolbar button.active {
+    background: #e0e7ff; border-color: #b9c5f0; color: #1e40af;
+  }
+  #image-toolbar .img-divider {
+    width: 1px; height: 18px;
+    background: var(--border);
+    margin: 0 4px;
+  }
+  #image-toolbar .danger { color: var(--danger); }
+  #image-toolbar .danger:hover { background: #fef2f2; border-color: #fecaca; }
+
+  /* ---------- Element styles panel ---------- */
+  #props-panel {
+    display: none;
+    flex-direction: column;
+    width: 300px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+  }
+  body.panel-open #props-panel { display: flex; }
+  #props-panel .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--panel); z-index: 1;
+  }
+  #props-panel .panel-header h3 { margin: 0; font-size: 14px; font-weight: 600; }
+  #props-panel .panel-body { padding: 8px 14px 18px; }
+  #props-panel .panel-section { padding: 10px 0; border-bottom: 1px solid #f0f1f3; }
+  #props-panel .panel-section:last-child { border-bottom: none; }
+  #props-panel .section-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin-bottom: 6px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #props-panel .sel-hint, #props-panel .el-hint {
+    font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0;
+  }
+  #props-panel .sel-hint { display: none; color: var(--accent); }
+  #props-panel .el-hint  { display: inline; color: var(--muted); }
+  body.has-text-selection #props-panel .sel-hint { display: inline; }
+  body.has-text-selection #props-panel .el-hint  { display: none; }
+  #props-panel .breadcrumb-empty { color: var(--muted); font-style: italic; font-size: 12px; }
+  #props-panel #props-breadcrumb {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  #props-panel .crumb {
+    display: inline-block;
+    padding: 1px 5px; margin: 1px;
+    border-radius: 3px;
+    background: #f0f2f5;
+    color: var(--text);
+    cursor: pointer;
+  }
+  #props-panel .crumb:hover { background: #e0e7ff; color: #1e40af; }
+  #props-panel .crumb.current { background: var(--accent); color: white; }
+  #props-panel .crumb-sep { color: var(--muted); margin: 0 1px; }
+
+  #props-panel .color-row {
+    display: flex; gap: 6px; align-items: center;
+  }
+  #props-panel input[type="color"] {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: none; padding: 0;
+    cursor: pointer;
+  }
+  #props-panel .color-row input[type="text"] {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid var(--border); border-radius: 4px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px;
+  }
+  #props-panel .color-row .icon-only,
+  #props-panel .panel-header .icon-only {
+    width: 28px; height: 28px;
+    min-width: 28px;
+    padding: 0;
+    font-size: 16px; line-height: 1;
+    color: var(--muted);
+  }
+  #props-panel input[type="range"] { width: 100%; }
+
+  #props-panel .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+  }
+  #props-panel .palette-swatch {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #props-panel .palette-swatch:hover {
+    transform: scale(1.1);
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  #props-panel .palette-swatch .apply-buttons {
+    position: absolute;
+    inset: auto 0 0 0;
+    display: none;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    font-size: 9px;
+    line-height: 1;
+    padding: 2px 0;
+  }
+  #props-panel .palette-swatch:hover .apply-buttons { display: flex; justify-content: space-around; }
+  #props-panel .palette-swatch .apply-buttons span {
+    cursor: pointer; padding: 1px 3px;
+  }
+  #props-panel .palette-swatch .apply-buttons span:hover { background: rgba(255,255,255,0.2); }
+  #props-panel .palette-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
+  #props-panel .palette-actions button { font-size: 11px; padding: 4px 8px; }
+  #props-panel .hint { font-size: 11px; color: var(--muted); margin: 4px 0; }
+
+  /* Background-image section */
+  .bg-img-section .bg-img-set { display: none; }
+  .bg-img-section.has-image .bg-img-empty { display: none; }
+  .bg-img-section.has-image .bg-img-set { display: block; }
+  .bg-img-empty button {
+    width: 100%; padding: 8px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+  }
+  .bg-img-empty button:hover { background: #f8fafc; color: var(--accent); border-color: var(--accent); }
+  .bg-img-preview {
+    width: 100%; height: 80px;
+    background: #f0f2f5 center / cover no-repeat;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #f0f0f0 75%), linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+  }
+  .bg-attr-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .bg-attr-row label {
+    flex: 0 0 80px;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .bg-attr-row select {
+    flex: 1;
+    padding: 5px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+  }
+
+  /* Selected-element outline (in iframe via injected style) */
+
+  /* ---------- Type Styles tab + panel (v1.5, Item 4) ---------- */
+  .panel-tabs {
+    display: flex;
+    flex: 1;
+    gap: 0;
+    margin: -10px -14px -10px -14px;
+    align-self: stretch;
+  }
+  .panel-tab {
+    flex: 1;
+    padding: 10px 6px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .panel-tab:hover { color: var(--text); background: #f8fafc; }
+  .panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .panel-tab-pane { display: none; }
+  .panel-tab-pane.active { display: block; }
+
+  /* Type styles list */
+  #type-rows { display: flex; flex-direction: column; }
+  .type-row { border-bottom: 1px solid #f0f1f3; }
+  .type-row:last-child { border-bottom: none; }
+  .type-row-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    text-align: left;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .type-row-toggle:hover { background: #f8fafc; }
+  .type-row.expanded .type-row-toggle { background: #f0f2f5; }
+  .type-row-label {
+    font-weight: 600;
+    flex: 0 0 110px;
+  }
+  .type-row-summary {
+    flex: 1;
+    color: var(--muted);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .type-row-summary.has-color {
+    padding-left: 18px;
+    position: relative;
+  }
+  .type-row-summary.has-color::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    background: var(--row-color, #ccc);
+    border: 1px solid rgba(0,0,0,0.12);
+  }
+  .type-row-chevron {
+    color: var(--muted);
+    font-size: 14px;
+    transition: transform 0.15s;
+    flex: 0 0 auto;
+  }
+  .type-row.expanded .type-row-chevron { transform: rotate(90deg); }
+  .type-row-body {
+    display: none;
+    padding: 6px 14px 14px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .type-row.expanded .type-row-body { display: flex; }
+  .type-field { display: flex; flex-direction: column; gap: 3px; }
+  .type-field > span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .type-field input[type="text"],
+  .type-field select {
+    width: 100%;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: inherit;
+    background: white;
+  }
+  .type-field input[type="text"]:focus,
+  .type-field select:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+  .type-field .color-row { display: flex; gap: 6px; align-items: center; }
+  .type-field .color-row input[type="color"] {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: none; padding: 0;
+    cursor: pointer;
+    flex: 0 0 28px;
+  }
+  .type-field .color-row input[type="text"] {
+    flex: 1;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  #type-pane .type-intro {
+    padding: 10px 14px 6px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  #type-pane .type-intro code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 10px;
+    background: #f0f2f5;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  #type-pane .type-actions {
+    padding: 12px 14px;
+    border-top: 1px solid #f0f1f3;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: #fafbfc;
+  }
+  #type-pane .type-actions button {
+    flex: 1;
+    font-size: 12px;
+    padding: 6px 8px;
+    min-width: 0;
+  }
+  #type-pane .type-actions #type-clear {
+    flex: 0 0 auto;
+    color: var(--muted);
+  }
+  #type-pane .type-actions #type-clear:hover {
+    color: var(--danger);
+    border-color: #fecaca;
+  }
+  /* Three-button polish (v1.5): brand-tinted primary + outlined secondary */
+  #type-pane .type-actions #type-export {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  #type-pane .type-actions #type-export:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+  }
+  #type-pane .type-actions #type-import {
+    background: white;
+    color: var(--accent);
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  #type-pane .type-actions #type-import:hover {
+    background: #F4EDEB;
+    border-color: var(--accent);
+  }
+
+  /* Master controls section (v1.5): pinned at top of Type Styles panel.
+     Provides Headline / Content fonts and Text / Link colors as page-wide
+     defaults that the per-element rows below can override. */
+  .type-master {
+    padding: 14px 14px 12px;
+    background: linear-gradient(to bottom, #fafbfc, #f5f6f8);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .type-master-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .type-master-field > label,
+  .type-master-row > label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .font-select-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.12s, background 0.12s, box-shadow 0.12s;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .font-select-btn:hover {
+    border-color: var(--accent);
+  }
+  .font-select-btn:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(127, 81, 73, 0.12);
+  }
+  .font-select-btn .font-select-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .font-select-btn .font-select-name.is-default {
+    color: var(--muted);
+    font-style: italic;
+  }
+  .font-select-btn .font-select-chevron {
+    color: var(--muted);
+    font-size: 11px;
+    flex: 0 0 auto;
+  }
+  .type-master-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .type-master-row .color-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .type-master-row .color-row input[type="color"] {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border); border-radius: 4px;
+    background: none; padding: 0;
+    cursor: pointer;
+    flex: 0 0 28px;
+  }
+  .type-master-row .color-row input[type="text"] {
+    flex: 1;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    background: white;
+  }
+  .type-master-row .color-row input[type="text"]:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+  .type-master-row .color-row button.icon-only {
+    flex: 0 0 auto;
+    padding: 4px 6px;
+    min-width: 28px;
+    height: 28px;
+  }
+
+  /* Font picker modal (v1.5) — custom dropdown for the type-style font fields.
+     Curated top-40 Google Fonts each rendered in their own typeface, plus
+     system fonts, search filter, custom-name input, and a link to the full
+     Google Fonts catalog. */
+  #font-picker-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  #font-picker-modal.open { display: flex; }
+  #font-picker-modal .box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    width: 520px;
+    max-width: 92vw;
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #font-picker-modal .picker-head {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  #font-picker-modal h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  #font-picker-modal .picker-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: white;
+  }
+  #font-picker-modal .picker-search-input:focus {
+    border-color: var(--accent);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(127, 81, 73, 0.12);
+  }
+  #font-picker-modal .picker-list {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 200px;
+  }
+  #font-picker-modal .picker-section-label {
+    padding: 10px 18px 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    background: #fafbfc;
+    border-bottom: 1px solid #f0f1f3;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  #font-picker-modal .picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: background 0.1s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    font-size: 17px;
+    color: var(--text);
+    border-bottom: 1px solid #f5f6f8;
+  }
+  #font-picker-modal .picker-item:hover {
+    background: #F4EDEB;
+  }
+  #font-picker-modal .picker-item.is-selected {
+    background: #F4EDEB;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  #font-picker-modal .picker-item.is-selected::before {
+    content: '✓ ';
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+  #font-picker-modal .picker-item .picker-source {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    flex: 0 0 auto;
+  }
+  #font-picker-modal .picker-item.is-selected .picker-source {
+    color: var(--accent);
+  }
+  #font-picker-modal .picker-empty {
+    padding: 24px 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  #font-picker-modal .picker-custom {
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    background: #fafbfc;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  #font-picker-modal .picker-custom-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    flex: 0 0 auto;
+  }
+  #font-picker-modal .picker-custom-input {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    background: white;
+  }
+  #font-picker-modal .picker-custom-input:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+  #font-picker-modal .picker-custom button {
+    padding: 7px 14px;
+    font-size: 13px;
+  }
+  #font-picker-modal .picker-footer {
+    padding: 10px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    gap: 12px;
+  }
+  #font-picker-modal .picker-link {
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  #font-picker-modal .picker-link:hover {
+    text-decoration: underline;
+  }
+  #font-picker-modal .picker-footer-actions {
+    display: flex;
+    gap: 6px;
+  }
+  #font-picker-modal .picker-clear {
+    color: var(--muted);
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  #font-picker-modal .picker-clear:hover {
+    color: var(--danger);
+    border-color: #fecaca;
+  }
+</style>
+
+<!-- CodeMirror: syntax-highlighted source view with line numbers -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.css">
+</head>
+<body class="view-page">
+
+<header>
+  <h1><span class="dot"></span>Camille<span class="separator">|</span><span class="tagline">Visual Composition for the AI-Built Web</span><span class="version">v1.5</span> <span class="filename" id="filename-label"></span></h1>
+  <div class="header-actions">
+    <label class="btn" for="file-input" title="Open an HTML file">Open File</label>
+    <input type="file" id="file-input" accept=".html,.htm,text/html">
+    <span id="refresh-warning" tabindex="0" role="note" aria-label="Refresh warning">
+      <span class="warn-icon" aria-hidden="true">⚠</span><span>Don't refresh</span>
+      <span class="warn-tooltip" role="tooltip">
+        <strong>Heads up:</strong> Refreshing or closing this tab without saving will lose your changes. Use <em>Save</em>, <em>Save As</em>, or <em>Copy HTML</em> first to preserve your work.
+      </span>
+    </span>
+    <button id="paste-btn" title="Paste HTML or a content block">Paste HTML</button>
+    <button id="new-btn" title="Start with a blank page">New</button>
+    <div class="view-group">
+      <button data-view="page" class="toggle view-btn" title="Visual editor only">Page</button>
+      <button data-view="source" class="toggle view-btn" title="HTML source only">Source</button>
+      <button data-view="split" class="toggle view-btn" title="Source + live preview">Split</button>
+    </div>
+    <button id="wrap-toggle" class="toggle" title="Toggle line wrapping in source view">Wrap</button>
+    <button id="wide-toggle" class="toggle" title="Render fragment edge-to-edge instead of in a 880px reading column">Wide</button>
+    <button id="props-toggle" class="toggle" title="Toggle element styles panel">Styles</button>
+    <button id="copy-btn" title="Copy HTML to clipboard">Copy HTML</button>
+    <button id="save-btn" class="primary" title="Save to disk (overwrite if you've used Save As, otherwise download)">Save</button>
+    <button id="save-as-btn" title="Save to a new file (choose location and name)">Save As</button>
+    <a class="help-link" href="https://camillehtml.com/userguide" target="_blank" rel="noopener" title="Open the User Guide in a new tab">Guide ↗</a>
+  </div>
+</header>
+
+<div id="toolbar">
+  <div class="group">
+    <select id="block-format" title="Paragraph format">
+      <option value="p">Paragraph</option>
+      <option value="h1">Heading 1</option>
+      <option value="h2">Heading 2</option>
+      <option value="h3">Heading 3</option>
+      <option value="h4">Heading 4</option>
+      <option value="blockquote">Quote</option>
+      <option value="pre">Code Block</option>
+    </select>
+  </div>
+  <div class="group">
+    <button data-cmd="bold" title="Bold (Ctrl/Cmd+B)"><b>B</b></button>
+    <button data-cmd="italic" title="Italic (Ctrl/Cmd+I)"><i>I</i></button>
+    <button data-cmd="underline" title="Underline (Ctrl/Cmd+U)"><u>U</u></button>
+    <button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+  </div>
+  <div class="group">
+    <button data-cmd="insertUnorderedList" title="Bulleted list">&bull; List</button>
+    <button data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+    <button data-cmd="outdent" title="Decrease indent">&larr;</button>
+    <button data-cmd="indent" title="Increase indent">&rarr;</button>
+  </div>
+  <div class="group">
+    <button data-cmd="justifyLeft" title="Align left">&#8676;</button>
+    <button data-cmd="justifyCenter" title="Align center">&#8633;</button>
+    <button data-cmd="justifyRight" title="Align right">&#8677;</button>
+  </div>
+  <div class="group">
+    <button id="link-btn" title="Insert/edit link">Link</button>
+    <button id="unlink-btn" title="Remove link">Unlink</button>
+  </div>
+  <div class="group">
+    <button data-cmd="removeFormat" title="Clear formatting">Clear</button>
+    <button data-cmd="undo" title="Undo (Ctrl/Cmd+Z)">Undo</button>
+    <button data-cmd="redo" title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+  </div>
+</div>
+
+<main>
+  <iframe id="editor-frame" title="Editor"></iframe>
+  <div id="split-divider" aria-hidden="true" title="Drag to resize. Double-click to reset to 50/50."></div>
+  <textarea id="source-view" spellcheck="false"></textarea>
+
+  <div id="welcome">
+    <img class="welcome-logo" src="Camille_logo_ltbg_tag_1000.webp" alt="Camille — Visual Composition for the AI-Built Web">
+    <p class="welcome-version">v1.5</p>
+    <p>Edit full HTML pages or content blocks visually. Click any text to edit, use the toolbar for formatting, then save back to a file or copy to your clipboard.</p>
+    <div class="actions">
+      <label class="btn primary" for="file-input-welcome">Open HTML File</label>
+      <input type="file" id="file-input-welcome" accept=".html,.htm,text/html">
+      <button id="paste-btn-welcome">Paste HTML</button>
+      <button id="new-btn-welcome">Start Blank</button>
+    </div>
+    <div id="drop-zone">
+      <strong>or drop an HTML file here</strong>
+      <div class="hint" style="margin-top: 6px;">Works with full pages or content fragments</div>
+    </div>
+    <div class="welcome-footer">
+      <a href="https://camillehtml.com/userguide" target="_blank" rel="noopener">User Guide</a>
+      &nbsp;·&nbsp;
+      Copyright © 2026 <a href="https://app.camillehtml.com" target="_blank" rel="noopener">SYP Media LLC</a>. All rights reserved.
+    </div>
+  </div>
+  <aside id="props-panel" aria-label="Style controls">
+    <div class="panel-header">
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-tab="element" type="button">Element</button>
+        <button class="panel-tab" data-tab="type" type="button">Type Styles</button>
+      </div>
+      <button id="props-close" class="icon-only" title="Close panel">×</button>
+    </div>
+    <div class="panel-tab-pane active" data-pane="element">
+    <div class="panel-body">
+      <div class="panel-section">
+        <div class="section-label">Selected element</div>
+        <div id="props-breadcrumb" class="breadcrumb-empty">Click an element in the editor</div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-label">Background <span class="sel-hint">→ highlights selection</span><span class="el-hint">→ entire element</span></div>
+        <div class="color-row">
+          <input type="color" id="props-bg-picker" title="Pick a color">
+          <input type="text" id="props-bg-text" placeholder="transparent" spellcheck="false">
+          <button id="props-bg-clear" class="icon-only" title="Remove background">×</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-label">Text color <span class="sel-hint">→ selected text only</span><span class="el-hint">→ entire element</span></div>
+        <div class="color-row">
+          <input type="color" id="props-fg-picker" title="Pick a color">
+          <input type="text" id="props-fg-text" placeholder="inherit" spellcheck="false">
+          <button id="props-fg-clear" class="icon-only" title="Reset text color">×</button>
+        </div>
+      </div>
+
+      <div class="panel-section bg-img-section" id="bg-img-section">
+        <div class="section-label">Background image</div>
+        <div class="bg-img-empty">
+          <button id="bg-img-add">+ Add background image</button>
+        </div>
+        <div class="bg-img-set">
+          <div id="bg-img-preview" class="bg-img-preview" title="Background image preview"></div>
+          <div class="color-row" style="margin-top: 6px;">
+            <input type="text" id="bg-img-url" placeholder="https://..." spellcheck="false">
+            <button id="bg-img-clear" class="icon-only" title="Remove background image">×</button>
+          </div>
+          <div class="bg-attr-row">
+            <label>Size</label>
+            <select id="bg-img-size">
+              <option value="">auto</option>
+              <option value="cover">cover</option>
+              <option value="contain">contain</option>
+              <option value="100% 100%">stretch (100% 100%)</option>
+            </select>
+          </div>
+          <div class="bg-attr-row">
+            <label>Position</label>
+            <select id="bg-img-position">
+              <option value="">default</option>
+              <option value="center center">center</option>
+              <option value="center top">top</option>
+              <option value="center bottom">bottom</option>
+              <option value="left top">top left</option>
+              <option value="right top">top right</option>
+              <option value="left bottom">bottom left</option>
+              <option value="right bottom">bottom right</option>
+            </select>
+          </div>
+          <div class="bg-attr-row">
+            <label>Repeat</label>
+            <select id="bg-img-repeat">
+              <option value="">repeat</option>
+              <option value="no-repeat">no-repeat</option>
+              <option value="repeat-x">repeat-x</option>
+              <option value="repeat-y">repeat-y</option>
+            </select>
+          </div>
+          <div class="bg-attr-row">
+            <label>Attachment</label>
+            <select id="bg-img-attachment">
+              <option value="">scroll (default)</option>
+              <option value="fixed">fixed (parallax)</option>
+              <option value="local">local</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="section-label">Opacity <span id="props-opacity-val">100%</span></div>
+        <input type="range" id="props-opacity" min="0" max="100" value="100" step="1">
+      </div>
+
+      <div class="panel-section">
+        <div class="section-label">Page palette <span class="hint" id="palette-count"></span></div>
+        <div id="props-palette" class="palette-grid"></div>
+        <p class="hint">Click a swatch to copy hex. Buttons below apply to selected element.</p>
+        <div class="palette-actions">
+          <button id="palette-rebuild" title="Rescan page colors">Rescan</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="panel-tab-pane" data-pane="type" id="type-pane">
+      <p class="type-intro">Page-wide typography. Changes write to a <code>&lt;style&gt;</code> block in your HTML and travel with the saved file. The master controls below set the page defaults; expand any row to override per-element.</p>
+      <div class="type-master">
+        <div class="type-master-field">
+          <label>Headline Font <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);">— H1–H6</span></label>
+          <button class="font-select-btn" type="button" data-master-field="headlineFamily">
+            <span class="font-select-name is-default">Default</span>
+            <span class="font-select-chevron">▾</span>
+          </button>
+        </div>
+        <div class="type-master-field">
+          <label>Content Font <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted);">— body, paragraphs, lists</span></label>
+          <button class="font-select-btn" type="button" data-master-field="contentFamily">
+            <span class="font-select-name is-default">Default</span>
+            <span class="font-select-chevron">▾</span>
+          </button>
+        </div>
+        <div class="type-master-row">
+          <label>Text color</label>
+          <div class="color-row">
+            <input type="color" class="master-color-picker" data-master-field="textColor" title="Pick text color">
+            <input type="text" data-master-field="textColor" placeholder="inherit (e.g., #3A3938)" spellcheck="false">
+            <button class="icon-only" data-master-clear="textColor" type="button" title="Clear">×</button>
+          </div>
+        </div>
+        <div class="type-master-row">
+          <label>Link color</label>
+          <div class="color-row">
+            <input type="color" class="master-color-picker" data-master-field="linkColor" title="Pick link color">
+            <input type="text" data-master-field="linkColor" placeholder="inherit (e.g., #7F5149)" spellcheck="false">
+            <button class="icon-only" data-master-clear="linkColor" type="button" title="Clear">×</button>
+          </div>
+        </div>
+      </div>
+      <div id="type-rows"></div>
+      <div class="type-actions">
+        <button id="type-export" type="button" title="Export your type styles as a portable spec (CSS / JSON / written brief)">Export Spec</button>
+        <button id="type-import" type="button" title="Import a type style spec">Import Spec</button>
+        <button id="type-clear" type="button" title="Remove all type styles from the page">Clear</button>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<div id="image-toolbar" role="toolbar" aria-label="Image controls">
+  <label>W: <input type="number" id="img-width" min="20" step="1"> px</label>
+  <div class="img-divider"></div>
+  <button data-align="left" title="Float left, text wraps right">Left</button>
+  <button data-align="center" title="Center on its own line">Center</button>
+  <button data-align="right" title="Float right, text wraps left">Right</button>
+  <button data-align="none" title="Inline with text, no float">Inline</button>
+  <div class="img-divider"></div>
+  <button id="img-src" title="View / edit image source URL">URL</button>
+  <button id="img-alt" title="Edit alt text">Alt</button>
+  <div class="img-divider"></div>
+  <button id="img-delete" class="danger" title="Delete image">Delete</button>
+</div>
+
+<div id="paste-modal">
+  <div class="box">
+    <h3>Paste HTML</h3>
+    <p class="hint" style="margin: -4px 0 0;">Paste a full HTML page or a fragment (a content block). The editor will handle either.</p>
+    <textarea id="paste-input" placeholder="<div class=&quot;block&quot;>...</div>  or  <!DOCTYPE html><html>..."></textarea>
+    <div class="modal-actions">
+      <button id="paste-cancel">Cancel</button>
+      <button id="paste-confirm" class="primary">Load</button>
+    </div>
+  </div>
+</div>
+
+<!-- Link dialog (v1.5) — replaces the old prompt() so we can preserve element styling
+     and offer a plain-language target picker (Items 1a + 1b). -->
+<div id="link-modal">
+  <div class="box">
+    <h3 id="link-modal-title">Insert link</h3>
+    <label class="link-field">
+      <span>URL</span>
+      <input type="text" id="link-url" spellcheck="false" placeholder="https://">
+    </label>
+    <fieldset class="link-target">
+      <legend>Open link in</legend>
+      <label><input type="radio" name="link-target" value="_self" checked> Same tab</label>
+      <label><input type="radio" name="link-target" value="_blank"> New tab / window</label>
+    </fieldset>
+    <p class="link-hint">Editing a styled element (like a button)? The original styling is preserved — only the URL and target change.</p>
+    <div class="modal-actions">
+      <button id="link-remove" type="button" title="Remove this link from the document">Remove link</button>
+      <span style="flex:1"></span>
+      <button id="link-cancel" type="button">Cancel</button>
+      <button id="link-confirm" type="button" class="primary">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- Font picker modal (v1.5) — custom dropdown for font fields with previews
+     rendered in each typeface, search filter, custom-name input, and a link
+     to the full Google Fonts catalog. -->
+<div id="font-picker-modal" role="dialog" aria-modal="true" aria-labelledby="font-picker-title">
+  <div class="box">
+    <div class="picker-head">
+      <h3 id="font-picker-title">Choose a font</h3>
+      <input type="text" id="font-picker-search" class="picker-search-input" placeholder="Search fonts…" spellcheck="false" autocomplete="off">
+    </div>
+    <div class="picker-list" id="font-picker-list"></div>
+    <div class="picker-custom">
+      <span class="picker-custom-label">Other</span>
+      <input type="text" id="font-picker-custom-name" class="picker-custom-input" placeholder="Type any Google Font name…" spellcheck="false" autocomplete="off">
+      <button id="font-picker-custom-apply" type="button" class="primary">Use</button>
+    </div>
+    <div class="picker-footer">
+      <a href="https://fonts.google.com" target="_blank" rel="noopener noreferrer" class="picker-link">Browse all on Google Fonts ↗</a>
+      <div class="picker-footer-actions">
+        <button id="font-picker-clear" type="button" class="picker-clear" title="Use default (no font set)">Clear</button>
+        <button id="font-picker-cancel" type="button">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function() {
+  const frame = document.getElementById('editor-frame');
+  const sourceView = document.getElementById('source-view');
+
+  // ---------- CodeMirror source editor ----------
+  let cm = null;
+  let wrapEnabled = true;
+  let widePreview = false;
+  try { widePreview = localStorage.getItem('cw-editor-wide') === '1'; } catch(e) {}
+  try {
+    const saved = localStorage.getItem('cw-editor-wrap');
+    if (saved !== null) wrapEnabled = saved === '1';
+  } catch(e) {}
+
+  if (window.CodeMirror) {
+    cm = CodeMirror.fromTextArea(sourceView, {
+      mode: 'htmlmixed',
+      theme: 'dracula',
+      lineNumbers: true,
+      lineWrapping: wrapEnabled,
+      indentUnit: 2,
+      tabSize: 2,
+      autoCloseTags: true,
+      matchBrackets: true,
+      extraKeys: {
+        'Ctrl-F': 'findPersistent',
+        'Cmd-F': 'findPersistent',
+        'Ctrl-H': 'replace',
+        'Cmd-Alt-F': 'replace'
+      }
+    });
+  }
+
+  // Wire up wrap toggle
+  const wrapToggle = document.getElementById('wrap-toggle');
+  function applyWrapState() {
+    if (cm) cm.setOption('lineWrapping', wrapEnabled);
+    wrapToggle.classList.toggle('active', wrapEnabled);
+  }
+  applyWrapState();
+  wrapToggle.addEventListener('click', () => {
+    wrapEnabled = !wrapEnabled;
+    try { localStorage.setItem('cw-editor-wrap', wrapEnabled ? '1' : '0'); } catch(e) {}
+    applyWrapState();
+    if (cm) cm.refresh();
+  });
+
+  // Wide-preview toggle — only meaningful for fragments (changes body wrapper width)
+  const wideToggle = document.getElementById('wide-toggle');
+  wideToggle.classList.toggle('active', widePreview);
+  wideToggle.addEventListener('click', () => {
+    widePreview = !widePreview;
+    try { localStorage.setItem('cw-editor-wide', widePreview ? '1' : '0'); } catch(e) {}
+    wideToggle.classList.toggle('active', widePreview);
+    if (state.loaded && state.isFragment) {
+      // Re-render iframe with the new wrapper width
+      if (state.view === 'split') {
+        updateIframePreview(getSourceText());
+      } else {
+        loadHTML(getCurrentHTML(), state.filename);
+      }
+    }
+  });
+  function getSourceText() { return cm ? cm.getValue() : sourceView.value; }
+  function setSourceText(s) { if (cm) cm.setValue(s); else sourceView.value = s; }
+  const welcome = document.getElementById('welcome');
+  const filenameLabel = document.getElementById('filename-label');
+  const toolbar = document.getElementById('toolbar');
+  const blockFormat = document.getElementById('block-format');
+  const dropZone = document.getElementById('drop-zone');
+  const pasteModal = document.getElementById('paste-modal');
+  const pasteInput = document.getElementById('paste-input');
+  const toast = document.getElementById('toast');
+
+  let state = {
+    filename: 'untitled.html',
+    isFragment: false,
+    view: 'page', // 'page' | 'source' | 'split'
+    loaded: false,
+    fileHandle: null // FileSystemFileHandle if user has Save-As'd or used the system picker
+  };
+
+  // ---------- Toast ----------
+  let toastTimer;
+  function showToast(msg, kind) {
+    toast.textContent = msg;
+    toast.className = 'show' + (kind ? ' ' + kind : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.className = ''; }, 2200);
+  }
+
+  // ---------- Detect & wrap ----------
+  function isFullPage(html) {
+    return /<\s*html[\s>]/i.test(html) || /<!doctype\s+html/i.test(html);
+  }
+
+  function wrapFragment(fragment) {
+    const maxWidth = widePreview ? 'none' : '880px';
+    const padding = widePreview ? '0' : '24px';
+    return '<!DOCTYPE html>\n<html>\n<head>\n<meta charset="UTF-8">\n<style>\n  body {\n    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;\n    color: #1f2328;\n    line-height: 1.55;\n    padding: ' + padding + ';\n    margin: 0;\n    max-width: ' + maxWidth + ';\n  }\n  h1, h2, h3, h4 { line-height: 1.25; }\n  a { color: #2f6feb; }\n  blockquote { border-left: 3px solid #d1d5db; margin: 1em 0; padding: 0 1em; color: #57606a; }\n  pre { background: #f6f8fa; padding: 12px; border-radius: 6px; overflow: auto; }\n  code { background: #f6f8fa; padding: 2px 5px; border-radius: 3px; font-size: 0.92em; }\n  img { max-width: 100%; height: auto; }\n  table { border-collapse: collapse; }\n  th, td { border: 1px solid #d1d5db; padding: 6px 10px; }\n</style>\n</head>\n<body>\n' + fragment + '\n</body>\n</html>';
+  }
+
+  // ---------- Load HTML ----------
+  function loadHTML(html, filename) {
+    state.isFragment = !isFullPage(html);
+    state.filename = filename || (state.isFragment ? 'block.html' : 'page.html');
+    state.fileHandle = null; // new content — no longer tied to whatever was previously Saved-As
+    filenameLabel.textContent = '— ' + state.filename;
+    document.body.classList.toggle('is-fragment', state.isFragment);
+
+    const docHtml = state.isFragment ? wrapFragment(html) : html;
+    frame.srcdoc = docHtml;
+    welcome.classList.add('hidden');
+    state.loaded = true;
+
+    frame.onload = function() {
+      try {
+        const doc = frame.contentDocument;
+        doc.designMode = 'on';
+        doc.addEventListener('selectionchange', updateToolbarState);
+        doc.addEventListener('keyup', updateToolbarState);
+        doc.addEventListener('mouseup', updateToolbarState);
+        setupImageEditing(doc);
+        setupIframeToSourceSync(doc);
+        rebuildSourcePositions();
+        // v1.5 fix (Item 2D): when the source/split pane is visible, push the new
+        // content into it so loadHTML callers (like the New button) don't leave
+        // stale code on screen.
+        if (state.view === 'source' || state.view === 'split') {
+          setSourceText(getCurrentHTML());
+          rebuildSourcePositions();
+        }
+        // v1.5: if the Type Styles tab is currently active, refresh it from the
+        // newly loaded page so the master + per-element rows reflect reality
+        // (previous file's state shouldn't bleed into the new file's display).
+        const activeTab = document.querySelector('.panel-tab.active');
+        if (activeTab && activeTab.dataset.tab === 'type' && typeof activateTypeTab === 'function') {
+          activateTypeTab();
+        }
+        doc.body.focus();
+      } catch (e) {
+        showToast('Could not enable editing: ' + e.message, 'error');
+      }
+    };
+  }
+
+  function newBlankPage() {
+    // Safety buffer (v1.5): if the user already has work loaded, confirm before
+    // wiping. Mirrors the Refresh warning's intent — don't lose unsaved work.
+    if (state.loaded) {
+      if (!confirm('Start a new blank page? Your current work will be lost unless you saved it first.')) return;
+    }
+    loadHTML('<h1>New Document</h1><p>Start typing here…</p>', 'untitled.html');
+  }
+
+  // ---------- Export HTML ----------
+  function getCurrentHTML() {
+    if (!state.loaded) return '';
+    deselectImage();
+    const doc = frame.contentDocument;
+    if (state.isFragment) {
+      const bodyClone = doc.body.cloneNode(true);
+      cleanEditingArtifacts(bodyClone);
+      return bodyClone.innerHTML.trim();
+    }
+    const htmlClone = doc.documentElement.cloneNode(true);
+    cleanEditingArtifacts(htmlClone);
+    return '<!DOCTYPE html>\n' + htmlClone.outerHTML;
+  }
+
+  function cleanEditingArtifacts(root) {
+    root.querySelectorAll('[data-cw-handle]').forEach(el => el.remove());
+    const injectedStyle = root.querySelector('#cw-img-styles');
+    if (injectedStyle) injectedStyle.remove();
+    root.querySelectorAll('.cw-selected-img').forEach(el => el.classList.remove('cw-selected-img'));
+    // Strip element-selection artifacts (parallel to image-selection cleanup above).
+    // Without this, the cw-selected-element class and its outline style block leak into saved HTML.
+    const selStyle = root.querySelector('#cw-sel-styles');
+    if (selStyle) selStyle.remove();
+    root.querySelectorAll('.cw-selected-element').forEach(el => {
+      el.classList.remove('cw-selected-element');
+      if (el.classList.length === 0) el.removeAttribute('class');
+    });
+    // Normalize meta charset to UTF-8 (we always write UTF-8 bytes on save)
+    const head = root.querySelector('head');
+    if (head) {
+      head.querySelectorAll('meta[charset], meta[http-equiv="Content-Type" i], meta[http-equiv="content-type" i]').forEach(el => el.remove());
+      const meta = root.ownerDocument.createElement('meta');
+      meta.setAttribute('charset', 'UTF-8');
+      head.insertBefore(meta, head.firstChild);
+    }
+  }
+
+  function downloadHTML(html) {
+    // Fallback path: trigger a browser download to the Downloads folder.
+    if (html === undefined) {
+      if (!state.loaded) { showToast('Nothing to save yet', 'error'); return; }
+      syncFromSourceIfNeeded();
+      html = getCurrentHTML();
+    }
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = state.filename || 'edited.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('Downloaded ' + a.download, 'success');
+  }
+
+  async function saveCurrent() {
+    if (!state.loaded) { showToast('Nothing to save yet', 'error'); return; }
+    syncFromSourceIfNeeded();
+    const html = getCurrentHTML();
+    // If we have a writable handle from a previous Save As, overwrite directly.
+    if (state.fileHandle) {
+      try {
+        if (state.fileHandle.queryPermission) {
+          let p = await state.fileHandle.queryPermission({ mode: 'readwrite' });
+          if (p !== 'granted') p = await state.fileHandle.requestPermission({ mode: 'readwrite' });
+          if (p !== 'granted') throw new Error('Write permission denied');
+        }
+        const writable = await state.fileHandle.createWritable();
+        await writable.write(html);
+        await writable.close();
+        showToast('Saved ' + state.filename, 'success');
+        return;
+      } catch (err) {
+        showToast('Could not save: ' + err.message, 'error');
+        return;
+      }
+    }
+    // No handle — fall back to a download
+    downloadHTML(html);
+  }
+
+  async function saveAs() {
+    if (!state.loaded) { showToast('Nothing to save yet', 'error'); return; }
+    syncFromSourceIfNeeded();
+    const html = getCurrentHTML();
+
+    // Modern path: native Save dialog (Chromium-based browsers)
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: state.filename || 'untitled.html',
+          types: [{
+            description: 'HTML file',
+            accept: { 'text/html': ['.html', '.htm'] }
+          }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(html);
+        await writable.close();
+        state.fileHandle = handle;
+        state.filename = handle.name;
+        filenameLabel.textContent = '— ' + state.filename;
+        showToast('Saved as ' + handle.name, 'success');
+        return;
+      } catch (err) {
+        if (err.name === 'AbortError') return; // user canceled the dialog
+        showToast('Could not save: ' + err.message, 'error');
+        return;
+      }
+    }
+
+    // Fallback: prompt for a new filename, download to Downloads
+    const newName = prompt('Save as (filename):', state.filename || 'untitled.html');
+    if (!newName) return;
+    let trimmed = newName.trim();
+    if (!/\.html?$/i.test(trimmed)) trimmed += '.html';
+    state.filename = trimmed;
+    state.fileHandle = null;
+    filenameLabel.textContent = '— ' + state.filename;
+    downloadHTML(html);
+  }
+
+  async function copyHTML() {
+    if (!state.loaded) { showToast('Nothing to copy yet', 'error'); return; }
+    syncFromSourceIfNeeded();
+    const html = getCurrentHTML();
+    try {
+      await navigator.clipboard.writeText(html);
+      showToast('HTML copied to clipboard', 'success');
+    } catch (e) {
+      const ta = document.createElement('textarea');
+      ta.value = html;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('HTML copied to clipboard', 'success');
+    }
+  }
+
+  // ---------- View modes (page / source / split) ----------
+  const viewButtons = document.querySelectorAll('button[data-view]');
+
+  // Position map: index of element in body order → {tag, line}
+  let sourcePositions = [];
+  let activeLineHandle = null;
+  let activeGutterLine = -1;
+
+  function buildElementPositions(source, isFragment) {
+    let startIdx = 0;
+    if (!isFragment) {
+      const bodyMatch = /<body\b[^>]*>/i.exec(source);
+      if (bodyMatch) startIdx = bodyMatch.index + bodyMatch[0].length;
+    }
+    const positions = [];
+    let i = startIdx;
+    while (i < source.length) {
+      // Skip comments
+      if (source.substr(i, 4) === '<!--') {
+        const end = source.indexOf('-->', i);
+        i = end === -1 ? source.length : end + 3;
+        continue;
+      }
+      // Skip script/style content (record opening tag, then jump past close)
+      const ssM = /^<(script|style)\b[^>]*>/i.exec(source.substr(i));
+      if (ssM) {
+        const lineNumber = source.substring(0, i).split('\n').length - 1;
+        positions.push({ tag: ssM[1].toLowerCase(), line: lineNumber });
+        const closeRe = new RegExp('</' + ssM[1] + '\\s*>', 'i');
+        const after = source.substr(i + ssM[0].length);
+        const closeM = closeRe.exec(after);
+        i = closeM ? i + ssM[0].length + closeM.index + closeM[0].length : source.length;
+        continue;
+      }
+      // Opening tag
+      const tagM = /^<([a-zA-Z][\w-]*)\b/.exec(source.substr(i));
+      if (tagM) {
+        const lineNumber = source.substring(0, i).split('\n').length - 1;
+        positions.push({ tag: tagM[1].toLowerCase(), line: lineNumber });
+        i++;
+        continue;
+      }
+      i++;
+    }
+    return positions;
+  }
+
+  function rebuildSourcePositions() {
+    if (!cm) return;
+    sourcePositions = buildElementPositions(getSourceText(), state.isFragment);
+  }
+
+  function elementIndexInBody(element, doc) {
+    let count = 0;
+    const all = doc.body.querySelectorAll('*');
+    for (const el of all) {
+      if (el.hasAttribute && el.hasAttribute('data-cw-handle')) continue;
+      if (el === element) return count;
+      count++;
+    }
+    return -1;
+  }
+
+  function clearActiveSourceLine() {
+    if (!cm) return;
+    if (activeLineHandle) {
+      try { cm.removeLineClass(activeLineHandle, 'background', 'cw-source-active'); } catch(e) {}
+      activeLineHandle = null;
+    }
+    if (activeGutterLine >= 0) {
+      try { cm.removeLineClass(activeGutterLine, 'gutter', 'cw-source-active-gutter'); } catch(e) {}
+      activeGutterLine = -1;
+    }
+  }
+
+  function highlightSourceLine(line) {
+    if (!cm) return;
+    clearActiveSourceLine();
+    activeLineHandle = cm.addLineClass(line, 'background', 'cw-source-active');
+    cm.addLineClass(line, 'gutter', 'cw-source-active-gutter');
+    activeGutterLine = line;
+    // v1.5: vertically center the highlighted line in the source viewport instead
+    // of letting it land near the bottom edge.
+    try {
+      const lineHeight = cm.defaultTextHeight();
+      const info = cm.getScrollInfo();
+      const linePos = cm.charCoords({ line: line, ch: 0 }, 'local');
+      const targetTop = linePos.top - (info.clientHeight / 2) + (lineHeight / 2);
+      cm.scrollTo(null, Math.max(0, targetTop));
+    } catch (e) {
+      cm.scrollIntoView({ line: line, ch: 0 }, 80);
+    }
+  }
+
+  function locateInSource(target) {
+    if (!cm || !target || !frame.contentDocument) return;
+    let el = target;
+    if (el.nodeType === 3) el = el.parentElement;
+    if (!el || (el.hasAttribute && el.hasAttribute('data-cw-handle'))) return;
+    const idx = elementIndexInBody(el, frame.contentDocument);
+    if (idx >= 0 && sourcePositions[idx]) {
+      highlightSourceLine(sourcePositions[idx].line);
+    }
+  }
+
+  function setupIframeToSourceSync(doc) {
+    let timer;
+    doc.addEventListener('input', () => {
+      if (state.view !== 'split') return;
+      if (cm && cm.hasFocus()) return; // user is typing in source — don't disturb cursor
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (!cm) return;
+        const html = getCurrentHTML();
+        const cursor = cm.getCursor();
+        const scroll = cm.getScrollInfo();
+        cm.setValue(html);
+        try { cm.setCursor(cursor); } catch(e) {}
+        cm.scrollTo(scroll.left, scroll.top);
+        rebuildSourcePositions();
+      }, 600);
+    });
+  }
+
+  function updateIframePreview(html) {
+    if (!frame.contentDocument) { loadHTML(html, state.filename); return; }
+    // v1.5 fix (Item 2A): preserve CodeMirror focus through the iframe re-render.
+    // The previous doc.open/write/close path stole focus, snapping the user's cursor
+    // into the page pane while they were typing in the source pane.
+    const cmHadFocus = !!(cm && cm.hasFocus());
+    const cmCursor = cmHadFocus ? cm.getCursor() : null;
+    const cmScroll = cmHadFocus ? cm.getScrollInfo() : null;
+
+    const doc = frame.contentDocument;
+    const docHtml = isFullPage(html) ? html : wrapFragment(html);
+    doc.open();
+    doc.write(docHtml);
+    doc.close();
+    // Keep editing enabled in split so users can edit on either side
+    try { doc.designMode = 'on'; } catch(e) {}
+    doc.addEventListener('selectionchange', updateToolbarState);
+    doc.addEventListener('keyup', updateToolbarState);
+    doc.addEventListener('mouseup', updateToolbarState);
+    setupImageEditing(doc);
+    setupIframeToSourceSync(doc);
+    rebuildSourcePositions();
+
+    // Restore CodeMirror focus / cursor / scroll after the iframe re-render
+    if (cmHadFocus && cm) {
+      // Defer so the iframe has finished transferring focus before we steal it back
+      setTimeout(() => {
+        try {
+          cm.focus();
+          if (cmCursor) cm.setCursor(cmCursor);
+          if (cmScroll) cm.scrollTo(cmScroll.left, cmScroll.top);
+        } catch(e) {}
+      }, 0);
+    }
+  }
+
+  function setView(mode) {
+    if (!['page','source','split'].includes(mode)) return;
+    if (mode === state.view) return;
+    if (!state.loaded && mode !== 'page') { showToast('Open a file first', 'error'); return; }
+
+    const from = state.view;
+
+    // Sync content based on the transition
+    if (state.loaded) {
+      if (from === 'page' && (mode === 'source' || mode === 'split')) {
+        setSourceText(getCurrentHTML());
+        rebuildSourcePositions();
+      } else if ((from === 'source' || from === 'split') && mode === 'page') {
+        // Reload iframe with the latest source content and re-enable designMode
+        loadHTML(getSourceText(), state.filename);
+      } else if (from === 'source' && mode === 'split') {
+        updateIframePreview(getSourceText());
+      } else if (from === 'split' && mode === 'source') {
+        // Source is already current; nothing to push
+      }
+    }
+
+    state.view = mode;
+    if (mode !== 'split') clearActiveSourceLine();
+    document.body.classList.remove('view-page', 'view-source', 'view-split');
+    document.body.classList.add('view-' + mode);
+    viewButtons.forEach(b => b.classList.toggle('active', b.dataset.view === mode));
+
+    if (cm && (mode === 'source' || mode === 'split')) {
+      setTimeout(() => { cm.refresh(); if (mode === 'source') cm.focus(); }, 0);
+    }
+    try { localStorage.setItem('cw-editor-view', mode); } catch(e) {}
+  }
+
+  // Mark Page as the initial active button
+  viewButtons.forEach(b => b.classList.toggle('active', b.dataset.view === 'page'));
+  viewButtons.forEach(btn => {
+    btn.addEventListener('click', () => setView(btn.dataset.view));
+  });
+
+  // Live source → preview sync in split mode (debounced)
+  if (cm) {
+    let splitSyncTimer;
+    cm.on('change', (cmInst, change) => {
+      if (change.origin === 'setValue') return; // programmatic — skip to avoid feedback
+      rebuildSourcePositions();
+      if (state.view !== 'split') return;
+      clearTimeout(splitSyncTimer);
+      splitSyncTimer = setTimeout(() => updateIframePreview(getSourceText()), 500);
+    });
+    // Click in source highlights the same source line
+    cm.on('cursorActivity', () => {
+      if (state.view !== 'split' && state.view !== 'source') return;
+      if (!cm.hasFocus()) return;
+      // Don't fight the visual side's highlight — only highlight when user clicks in source
+    });
+  }
+
+  function syncFromSourceIfNeeded() {
+    if (state.view === 'source' || state.view === 'split') {
+      const html = getSourceText();
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      if (state.isFragment) {
+        doc.body.innerHTML = html;
+      } else {
+        doc.open();
+        doc.write(html);
+        doc.close();
+        if (state.view === 'page') doc.designMode = 'on';
+      }
+    }
+  }
+
+  // ---------- Toolbar commands ----------
+  function exec(cmd, val) {
+    if (!state.loaded) return;
+    const doc = frame.contentDocument;
+    doc.body.focus();
+    doc.execCommand(cmd, false, val || null);
+    updateToolbarState();
+  }
+
+  function updateToolbarState() {
+    if (!state.loaded || state.view !== 'page') return;
+    const doc = frame.contentDocument;
+    toolbar.querySelectorAll('button[data-cmd]').forEach(btn => {
+      const cmd = btn.dataset.cmd;
+      try {
+        if (doc.queryCommandState(cmd)) btn.classList.add('active');
+        else btn.classList.remove('active');
+      } catch(e) {}
+    });
+    try {
+      const node = doc.getSelection().anchorNode;
+      if (node) {
+        let el = node.nodeType === 1 ? node : node.parentElement;
+        while (el && el !== doc.body) {
+          const tag = el.tagName.toLowerCase();
+          if (['p','h1','h2','h3','h4','h5','h6','blockquote','pre'].includes(tag)) {
+            blockFormat.value = tag;
+            return;
+          }
+          el = el.parentElement;
+        }
+      }
+      blockFormat.value = 'p';
+    } catch(e) {}
+  }
+
+  toolbar.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-cmd]');
+    if (btn) exec(btn.dataset.cmd);
+  });
+
+  blockFormat.addEventListener('change', () => {
+    exec('formatBlock', blockFormat.value);
+  });
+
+  // ---------- Link dialog (v1.5, Items 1a + 1b) ----------
+  // Replaces the old prompt(). Two key behaviors:
+  //   1a — Preserve styling: when the user edits a link inside an existing <a>
+  //        (e.g. a button-shaped link), update href/target/rel attributes directly
+  //        instead of running execCommand('createLink'), which would strip the
+  //        surrounding markup and turn a styled button into a plain text link.
+  //   1b — Plain-language target picker: "Same tab" / "New tab / window" radio
+  //        buttons map to no-target vs target="_blank" with rel="noopener noreferrer".
+  const linkModal = document.getElementById('link-modal');
+  const linkUrlInput = document.getElementById('link-url');
+  const linkModalTitle = document.getElementById('link-modal-title');
+  const linkRemoveBtn = document.getElementById('link-remove');
+  let linkContext = null; // { existingAnchor, savedRange } while the dialog is open
+
+  function findEnclosingAnchor(node, doc) {
+    let el = node && node.nodeType === 1 ? node : (node && node.parentElement);
+    while (el && el !== doc.body) {
+      if (el.tagName === 'A') return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function openLinkDialog() {
+    if (!state.loaded) return;
+    const doc = frame.contentDocument;
+    if (!doc) { showToast('Editor not ready', 'error'); return; }
+    const sel = doc.getSelection();
+    let savedRange = null;
+    let existingAnchor = null;
+    if (sel && sel.rangeCount > 0) {
+      savedRange = sel.getRangeAt(0).cloneRange();
+      existingAnchor = findEnclosingAnchor(sel.anchorNode, doc);
+    }
+    if (!existingAnchor && (!savedRange || savedRange.collapsed)) {
+      showToast('Select some text or click on a link first', 'error');
+      return;
+    }
+    linkContext = { existingAnchor, savedRange };
+
+    if (existingAnchor) {
+      linkModalTitle.textContent = 'Edit link';
+      linkUrlInput.value = existingAnchor.getAttribute('href') || '';
+      const tgt = (existingAnchor.getAttribute('target') || '_self').toLowerCase();
+      const radio = linkModal.querySelector('input[name="link-target"][value="' + (tgt === '_blank' ? '_blank' : '_self') + '"]');
+      if (radio) radio.checked = true;
+      linkRemoveBtn.style.display = '';
+    } else {
+      linkModalTitle.textContent = 'Insert link';
+      linkUrlInput.value = 'https://';
+      const radio = linkModal.querySelector('input[name="link-target"][value="_self"]');
+      if (radio) radio.checked = true;
+      linkRemoveBtn.style.display = 'none';
+    }
+
+    linkModal.classList.add('show');
+    setTimeout(() => { linkUrlInput.focus(); linkUrlInput.select(); }, 50);
+  }
+
+  function closeLinkDialog() {
+    linkModal.classList.remove('show');
+    linkContext = null;
+  }
+
+  function applyLinkDialog() {
+    if (!linkContext) return;
+    const url = linkUrlInput.value.trim();
+    const target = (linkModal.querySelector('input[name="link-target"]:checked') || {}).value || '_self';
+    const doc = frame.contentDocument;
+    if (!url) { showToast('Enter a URL or click "Remove link"', 'error'); return; }
+
+    if (linkContext.existingAnchor) {
+      // Edit-in-place: preserves element type, classes, inline styles, children — fixes 1a
+      const a = linkContext.existingAnchor;
+      a.setAttribute('href', url);
+      if (target === '_blank') {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+      } else {
+        a.removeAttribute('target');
+        // Only strip rel values we typically auto-add — preserve user-set rel attributes
+        const rel = (a.getAttribute('rel') || '').trim();
+        if (rel === 'noopener noreferrer' || rel === 'noopener' || rel === 'noreferrer') {
+          a.removeAttribute('rel');
+        }
+      }
+    } else {
+      // No existing anchor — restore the saved selection and use createLink
+      try {
+        const sel = doc.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(linkContext.savedRange);
+      } catch(e) {}
+      doc.body.focus();
+      doc.execCommand('createLink', false, url);
+      if (target === '_blank') {
+        const newAnchor = findEnclosingAnchor(doc.getSelection().anchorNode, doc);
+        if (newAnchor) {
+          newAnchor.setAttribute('target', '_blank');
+          newAnchor.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+    }
+
+    closeLinkDialog();
+    updateToolbarState();
+    if (state.view === 'split') {
+      setSourceText(getCurrentHTML());
+      rebuildSourcePositions();
+    }
+  }
+
+  function removeLinkFromDialog() {
+    if (!linkContext) return;
+    if (linkContext.existingAnchor) {
+      const a = linkContext.existingAnchor;
+      // Replace the anchor with its children — preserves any wrapping styling on parents
+      const parent = a.parentNode;
+      while (a.firstChild) parent.insertBefore(a.firstChild, a);
+      parent.removeChild(a);
+    }
+    closeLinkDialog();
+    if (state.view === 'split') {
+      setSourceText(getCurrentHTML());
+      rebuildSourcePositions();
+    }
+  }
+
+  document.getElementById('link-btn').addEventListener('click', openLinkDialog);
+  document.getElementById('unlink-btn').addEventListener('click', () => exec('unlink'));
+  document.getElementById('link-confirm').addEventListener('click', applyLinkDialog);
+  document.getElementById('link-cancel').addEventListener('click', closeLinkDialog);
+  linkRemoveBtn.addEventListener('click', removeLinkFromDialog);
+  linkModal.addEventListener('click', (e) => {
+    if (e.target === linkModal) closeLinkDialog();
+  });
+  linkUrlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyLinkDialog(); }
+  });
+
+  // ---------- File loading ----------
+  function detectEncoding(bytes) {
+    if (bytes.length >= 3 && bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) return 'utf-8';
+    if (bytes.length >= 2 && bytes[0] === 0xFF && bytes[1] === 0xFE) return 'utf-16le';
+    if (bytes.length >= 2 && bytes[0] === 0xFE && bytes[1] === 0xFF) return 'utf-16be';
+    try {
+      const head = new TextDecoder('ascii').decode(bytes.slice(0, 4096));
+      const m = head.match(/<meta[^>]*charset\s*=\s*["']?\s*([\w-]+)/i);
+      if (m) return m[1].toLowerCase();
+    } catch(e) {}
+    return null; // unknown — try UTF-8 first, fall back to windows-1252
+  }
+
+  function decodeBytes(bytes) {
+    const declared = detectEncoding(bytes);
+    if (declared) {
+      try { return { text: new TextDecoder(declared).decode(bytes), encoding: declared }; }
+      catch(e) {}
+    }
+    // Try strict UTF-8 — if it throws, the file isn't UTF-8
+    try {
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+      return { text, encoding: 'utf-8' };
+    } catch(e) {
+      // Fall back to Windows-1252 (covers most legacy HTML, Word/Outlook exports)
+      const text = new TextDecoder('windows-1252').decode(bytes);
+      return { text, encoding: 'windows-1252' };
+    }
+  }
+
+  function readFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const bytes = new Uint8Array(e.target.result);
+      const { text, encoding } = decodeBytes(bytes);
+      if (encoding !== 'utf-8') {
+        showToast('Loaded as ' + encoding + ' (will save as UTF-8)', 'success');
+      }
+      loadHTML(text, file.name);
+    };
+    reader.onerror = () => showToast('Could not read file', 'error');
+    reader.readAsArrayBuffer(file);
+  }
+
+  document.getElementById('file-input').addEventListener('change', (e) => {
+    if (e.target.files[0]) readFile(e.target.files[0]);
+  });
+  document.getElementById('file-input-welcome').addEventListener('change', (e) => {
+    if (e.target.files[0]) readFile(e.target.files[0]);
+  });
+
+  ['dragenter', 'dragover'].forEach(ev =>
+    dropZone.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.classList.add('dragover');
+    })
+  );
+  ['dragleave', 'drop'].forEach(ev =>
+    dropZone.addEventListener(ev, (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dropZone.classList.remove('dragover');
+    })
+  );
+  dropZone.addEventListener('drop', (e) => {
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) readFile(file);
+  });
+
+  // ---------- Paste modal ----------
+  function openPasteModal() {
+    pasteInput.value = '';
+    pasteModal.classList.add('show');
+    setTimeout(() => pasteInput.focus(), 50);
+  }
+  function closePasteModal() {
+    pasteModal.classList.remove('show');
+  }
+  document.getElementById('paste-btn').addEventListener('click', openPasteModal);
+  document.getElementById('paste-btn-welcome').addEventListener('click', openPasteModal);
+  document.getElementById('paste-cancel').addEventListener('click', closePasteModal);
+  document.getElementById('paste-confirm').addEventListener('click', () => {
+    const html = pasteInput.value.trim();
+    if (!html) { showToast('Paste some HTML first', 'error'); return; }
+    loadHTML(html, isFullPage(html) ? 'pasted.html' : 'block.html');
+    closePasteModal();
+  });
+  pasteModal.addEventListener('click', (e) => {
+    if (e.target === pasteModal) closePasteModal();
+  });
+
+  // ---------- New / Source / Copy / Save ----------
+  document.getElementById('new-btn').addEventListener('click', newBlankPage);
+  document.getElementById('new-btn-welcome').addEventListener('click', newBlankPage);
+  document.getElementById('copy-btn').addEventListener('click', copyHTML);
+  document.getElementById('save-btn').addEventListener('click', saveCurrent);
+  document.getElementById('save-as-btn').addEventListener('click', saveAs);
+
+  // ---------- Keyboard shortcuts ----------
+  document.addEventListener('keydown', (e) => {
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && e.shiftKey && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveAs();
+    } else if (mod && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      saveCurrent();
+    }
+    if (e.key === 'Escape') {
+      if (pasteModal.classList.contains('show')) closePasteModal();
+      else if (linkModal.classList.contains('show')) closeLinkDialog();
+      else deselectImage();
+    }
+  });
+
+  // ---------- Image editing ----------
+  let selectedImg = null;
+  const imageToolbar = document.getElementById('image-toolbar');
+  const imgWidthInput = document.getElementById('img-width');
+
+  function positionImageToolbar() {
+    if (!selectedImg) return;
+    const frameRect = frame.getBoundingClientRect();
+    const imgRect = selectedImg.getBoundingClientRect();
+    const tbHeight = imageToolbar.offsetHeight || 36;
+    let top = frameRect.top + imgRect.top - tbHeight - 8;
+    let left = frameRect.left + imgRect.left;
+    if (top < 8) top = frameRect.top + imgRect.bottom + 8;
+    const maxLeft = window.innerWidth - imageToolbar.offsetWidth - 8;
+    if (left > maxLeft) left = maxLeft;
+    if (left < 8) left = 8;
+    imageToolbar.style.top = top + 'px';
+    imageToolbar.style.left = left + 'px';
+  }
+
+  function selectImage(img) {
+    deselectImage();
+    selectedImg = img;
+    img.classList.add('cw-selected-img');
+    imgWidthInput.value = Math.round(img.getBoundingClientRect().width);
+    imageToolbar.querySelectorAll('button[data-align]').forEach(b => {
+      b.classList.toggle('active', b.dataset.align === currentAlign(img));
+    });
+    imageToolbar.classList.add('show');
+    positionImageToolbar();
+    addResizeHandle(img);
+  }
+
+  function deselectImage() {
+    if (!selectedImg) return;
+    selectedImg.classList.remove('cw-selected-img');
+    removeResizeHandle();
+    selectedImg = null;
+    imageToolbar.classList.remove('show');
+  }
+
+  function currentAlign(img) {
+    const s = img.style;
+    if (s.float === 'left') return 'left';
+    if (s.float === 'right') return 'right';
+    if (s.display === 'block' && (s.marginLeft === 'auto' || s.margin.includes('auto'))) return 'center';
+    return 'none';
+  }
+
+  function applyAlign(img, align) {
+    img.style.float = '';
+    img.style.display = '';
+    img.style.marginLeft = '';
+    img.style.marginRight = '';
+    img.style.margin = '';
+    if (align === 'left') { img.style.float = 'left'; img.style.marginRight = '12px'; img.style.marginBottom = '8px'; }
+    else if (align === 'right') { img.style.float = 'right'; img.style.marginLeft = '12px'; img.style.marginBottom = '8px'; }
+    else if (align === 'center') { img.style.display = 'block'; img.style.marginLeft = 'auto'; img.style.marginRight = 'auto'; }
+  }
+
+  function addResizeHandle(img) {
+    removeResizeHandle();
+    const doc = frame.contentDocument;
+    const handle = doc.createElement('div');
+    handle.setAttribute('data-cw-handle', '1');
+    handle.style.cssText = 'position:absolute;width:14px;height:14px;background:#2f6feb;border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3);cursor:nwse-resize;z-index:9999;';
+    doc.body.appendChild(handle);
+    positionResizeHandle(handle, img);
+
+    let dragging = false, startX = 0, startW = 0, ratio = 1;
+    handle.addEventListener('mousedown', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      dragging = true;
+      startX = e.clientX;
+      const r = img.getBoundingClientRect();
+      startW = r.width;
+      ratio = r.height / r.width;
+    });
+    doc.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      const newW = Math.max(20, Math.round(startW + dx));
+      img.style.width = newW + 'px';
+      img.style.height = 'auto';
+      imgWidthInput.value = newW;
+      positionResizeHandle(handle, img);
+      positionImageToolbar();
+    });
+    doc.addEventListener('mouseup', () => { dragging = false; });
+    img._cwHandle = handle;
+  }
+
+  function positionResizeHandle(handle, img) {
+    const doc = frame.contentDocument;
+    const scrollY = doc.documentElement.scrollTop || doc.body.scrollTop;
+    const scrollX = doc.documentElement.scrollLeft || doc.body.scrollLeft;
+    const r = img.getBoundingClientRect();
+    handle.style.top = (r.bottom + scrollY - 7) + 'px';
+    handle.style.left = (r.right + scrollX - 7) + 'px';
+  }
+
+  function removeResizeHandle() {
+    if (!selectedImg) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    doc.querySelectorAll('[data-cw-handle]').forEach(el => el.remove());
+    if (selectedImg) selectedImg._cwHandle = null;
+  }
+
+  function injectImageStyles(doc) {
+    if (doc.getElementById('cw-img-styles')) return;
+    const style = doc.createElement('style');
+    style.id = 'cw-img-styles';
+    style.textContent = '.cw-selected-img { outline: 2px solid #2f6feb; outline-offset: 2px; }';
+    doc.head.appendChild(style);
+  }
+
+  function setupImageEditing(doc) {
+    injectImageStyles(doc);
+    doc.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t && t.tagName === 'IMG') {
+        e.preventDefault();
+        selectImage(t);
+      } else if (!t.closest || !t.closest('[data-cw-handle]')) {
+        deselectImage();
+      }
+      // In split mode, follow the click to the source pane
+      if (state.view === 'split') locateInSource(t);
+    });
+    // Drag-select also highlights source
+    doc.addEventListener('mouseup', () => {
+      if (state.view !== 'split') return;
+      const sel = doc.getSelection();
+      if (sel && sel.anchorNode) locateInSource(sel.anchorNode);
+    });
+    doc.addEventListener('scroll', () => {
+      if (selectedImg) {
+        positionImageToolbar();
+        if (selectedImg._cwHandle) positionResizeHandle(selectedImg._cwHandle, selectedImg);
+      }
+    }, true);
+    window.addEventListener('resize', () => {
+      if (selectedImg) {
+        positionImageToolbar();
+        if (selectedImg._cwHandle) positionResizeHandle(selectedImg._cwHandle, selectedImg);
+      }
+    });
+  }
+
+  imgWidthInput.addEventListener('input', () => {
+    if (!selectedImg) return;
+    const w = parseInt(imgWidthInput.value, 10);
+    if (!isNaN(w) && w >= 20) {
+      selectedImg.style.width = w + 'px';
+      selectedImg.style.height = 'auto';
+      if (selectedImg._cwHandle) positionResizeHandle(selectedImg._cwHandle, selectedImg);
+      positionImageToolbar();
+    }
+  });
+
+  imageToolbar.querySelectorAll('button[data-align]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!selectedImg) return;
+      applyAlign(selectedImg, btn.dataset.align);
+      imageToolbar.querySelectorAll('button[data-align]').forEach(b => {
+        b.classList.toggle('active', b === btn);
+      });
+      positionImageToolbar();
+      if (selectedImg._cwHandle) positionResizeHandle(selectedImg._cwHandle, selectedImg);
+    });
+  });
+
+  document.getElementById('img-src').addEventListener('click', () => {
+    if (!selectedImg) return;
+    const current = selectedImg.getAttribute('src') || '';
+    const updated = prompt('Image source URL:', current);
+    if (updated === null) return;
+    const trimmed = updated.trim();
+    if (trimmed) selectedImg.setAttribute('src', trimmed);
+    else selectedImg.removeAttribute('src');
+  });
+
+  document.getElementById('img-alt').addEventListener('click', () => {
+    if (!selectedImg) return;
+    const current = selectedImg.getAttribute('alt') || '';
+    const updated = prompt('Alt text (describe the image for screen readers):', current);
+    if (updated === null) return;
+    selectedImg.setAttribute('alt', updated);
+  });
+
+  document.getElementById('img-delete').addEventListener('click', () => {
+    if (!selectedImg) return;
+    const img = selectedImg;
+    deselectImage();
+    img.remove();
+  });
+
+  // ---------- Element styles panel ----------
+  const propsPanel = document.getElementById('props-panel');
+  const propsToggleBtn = document.getElementById('props-toggle');
+  const propsCloseBtn = document.getElementById('props-close');
+  const propsBreadcrumb = document.getElementById('props-breadcrumb');
+  const propsBgPicker = document.getElementById('props-bg-picker');
+  const propsBgText = document.getElementById('props-bg-text');
+  const propsBgClear = document.getElementById('props-bg-clear');
+  const propsFgPicker = document.getElementById('props-fg-picker');
+  const propsFgText = document.getElementById('props-fg-text');
+  const propsFgClear = document.getElementById('props-fg-clear');
+  const propsOpacity = document.getElementById('props-opacity');
+  const propsOpacityVal = document.getElementById('props-opacity-val');
+  const propsPalette = document.getElementById('props-palette');
+  const paletteCount = document.getElementById('palette-count');
+  let selectedEl = null;
+
+  // Restore panel state
+  let panelOpen = false;
+  try { panelOpen = localStorage.getItem('cw-editor-panel') === '1'; } catch(e) {}
+  if (panelOpen) {
+    document.body.classList.add('panel-open');
+    propsToggleBtn.classList.add('active');
+  }
+  propsToggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('panel-open');
+    const open = document.body.classList.contains('panel-open');
+    propsToggleBtn.classList.toggle('active', open);
+    try { localStorage.setItem('cw-editor-panel', open ? '1' : '0'); } catch(e) {}
+    if (open) buildPagePalette();
+  });
+  propsCloseBtn.addEventListener('click', () => propsToggleBtn.click());
+
+  function rgbToHex(rgb) {
+    if (!rgb) return null;
+    rgb = rgb.trim().toLowerCase();
+    if (rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)' || rgb === '') return null;
+    if (rgb.startsWith('#')) return rgb;
+    const m = rgb.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+    if (!m) return null;
+    const toHex = n => parseInt(n).toString(16).padStart(2, '0');
+    return '#' + toHex(m[1]) + toHex(m[2]) + toHex(m[3]);
+  }
+
+  function injectSelectedStyle(doc) {
+    if (doc.getElementById('cw-sel-styles')) return;
+    const s = doc.createElement('style');
+    s.id = 'cw-sel-styles';
+    s.textContent = '.cw-selected-element { outline: 2px dashed #2f6feb !important; outline-offset: 2px !important; }';
+    doc.head.appendChild(s);
+  }
+
+  function findEditableAncestor(el, doc) {
+    if (!el) return null;
+    if (el.nodeType === 3) el = el.parentElement;
+    while (el && el !== doc.body && el !== doc.documentElement) {
+      if (el.hasAttribute && el.hasAttribute('data-cw-handle')) {
+        el = el.parentElement;
+        continue;
+      }
+      return el;
+    }
+    return null;
+  }
+
+  function setSelectedElement(el) {
+    if (!frame.contentDocument) return;
+    const doc = frame.contentDocument;
+    if (selectedEl) selectedEl.classList.remove('cw-selected-element');
+    selectedEl = el;
+    if (selectedEl) {
+      injectSelectedStyle(doc);
+      selectedEl.classList.add('cw-selected-element');
+    }
+    refreshPropsPanel();
+  }
+
+  function refreshPropsPanel() {
+    if (!selectedEl || !frame.contentDocument) {
+      propsBreadcrumb.className = 'breadcrumb-empty';
+      propsBreadcrumb.textContent = 'Click an element in the editor';
+      propsBgText.value = ''; propsFgText.value = '';
+      propsOpacity.value = 100; propsOpacityVal.textContent = '100%';
+      return;
+    }
+    const doc = frame.contentDocument;
+    // Build clickable breadcrumb (root → leaf)
+    propsBreadcrumb.className = '';
+    propsBreadcrumb.innerHTML = '';
+    const chain = [];
+    let cur = selectedEl;
+    while (cur && cur !== doc.body) { chain.unshift(cur); cur = cur.parentElement; }
+    chain.forEach((node, i) => {
+      let label = node.tagName.toLowerCase();
+      if (node.id) label += '#' + node.id;
+      if (node.classList && node.classList.length) {
+        const cls = Array.from(node.classList).filter(c => !c.startsWith('cw-')).slice(0, 2);
+        if (cls.length) label += '.' + cls.join('.');
+      }
+      const span = document.createElement('span');
+      span.className = 'crumb' + (i === chain.length - 1 ? ' current' : '');
+      span.textContent = label;
+      span.addEventListener('click', () => setSelectedElement(node));
+      propsBreadcrumb.appendChild(span);
+      if (i < chain.length - 1) {
+        const sep = document.createElement('span');
+        sep.className = 'crumb-sep';
+        sep.textContent = '›';
+        propsBreadcrumb.appendChild(sep);
+      }
+    });
+    // Read current styles
+    const cs = doc.defaultView.getComputedStyle(selectedEl);
+    const bgHex = rgbToHex(cs.backgroundColor);
+    const fgHex = rgbToHex(cs.color);
+    if (bgHex) { propsBgPicker.value = bgHex; propsBgText.value = bgHex; }
+    else { propsBgText.value = ''; }
+    if (fgHex) { propsFgPicker.value = fgHex; propsFgText.value = fgHex; }
+    else { propsFgText.value = ''; }
+    const op = Math.round(parseFloat(cs.opacity || '1') * 100);
+    propsOpacity.value = op;
+    propsOpacityVal.textContent = op + '%';
+    refreshBgImagePanel();
+  }
+
+  // Cached iframe text selection — used to detect when user has selected text
+  // and to restore that selection after the panel steals focus.
+  let lastIframeRange = null;
+  function captureIframeSelection() {
+    if (!frame.contentDocument) return;
+    const sel = frame.contentDocument.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      lastIframeRange = sel.getRangeAt(0).cloneRange();
+    } else {
+      lastIframeRange = null;
+    }
+  }
+  function hasTextSelection() {
+    return !!(lastIframeRange && !lastIframeRange.collapsed);
+  }
+  function restoreIframeSelection() {
+    if (!lastIframeRange || !frame.contentDocument) return false;
+    const doc = frame.contentDocument;
+    try {
+      doc.body.focus();
+      const sel = doc.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(lastIframeRange);
+      return true;
+    } catch(e) { return false; }
+  }
+
+  function applyBg(color) {
+    if (!color) {
+      if (selectedEl) selectedEl.style.removeProperty('background-color');
+      return;
+    }
+    if (hasTextSelection()) {
+      restoreIframeSelection();
+      const doc = frame.contentDocument;
+      try { doc.execCommand('styleWithCSS', false, true); } catch(e) {}
+      // hiliteColor: works in Chrome/Edge/Firefox; backColor is the WebKit/Safari fallback
+      if (!doc.execCommand('hiliteColor', false, color)) {
+        doc.execCommand('backColor', false, color);
+      }
+    } else if (selectedEl) {
+      selectedEl.style.backgroundColor = color;
+    }
+  }
+  function applyFg(color) {
+    if (!color) {
+      if (selectedEl) selectedEl.style.removeProperty('color');
+      return;
+    }
+    if (hasTextSelection()) {
+      restoreIframeSelection();
+      const doc = frame.contentDocument;
+      try { doc.execCommand('styleWithCSS', false, true); } catch(e) {}
+      doc.execCommand('foreColor', false, color);
+    } else if (selectedEl) {
+      selectedEl.style.color = color;
+    }
+  }
+
+  propsBgPicker.addEventListener('input', () => { propsBgText.value = propsBgPicker.value; applyBg(propsBgPicker.value); });
+  propsBgText.addEventListener('change', () => {
+    const v = propsBgText.value.trim();
+    applyBg(v);
+    if (v.match(/^#[0-9a-f]{6}$/i)) propsBgPicker.value = v.toLowerCase();
+  });
+  propsBgClear.addEventListener('click', () => { applyBg(''); propsBgText.value = ''; });
+
+  propsFgPicker.addEventListener('input', () => { propsFgText.value = propsFgPicker.value; applyFg(propsFgPicker.value); });
+  propsFgText.addEventListener('change', () => {
+    const v = propsFgText.value.trim();
+    applyFg(v);
+    if (v.match(/^#[0-9a-f]{6}$/i)) propsFgPicker.value = v.toLowerCase();
+  });
+  propsFgClear.addEventListener('click', () => { applyFg(''); propsFgText.value = ''; });
+
+  propsOpacity.addEventListener('input', () => {
+    const v = parseInt(propsOpacity.value, 10);
+    propsOpacityVal.textContent = v + '%';
+    if (selectedEl) selectedEl.style.opacity = (v / 100).toString();
+  });
+
+  // Page palette extraction
+  function buildPagePalette() {
+    if (!frame.contentDocument) return;
+    const doc = frame.contentDocument;
+    const colors = new Map(); // hex → original-string
+    const skip = new Set(['rgba(0, 0, 0, 0)', 'transparent', '']);
+    function add(val) {
+      if (!val || skip.has(val)) return;
+      const hex = rgbToHex(val);
+      if (hex && !colors.has(hex)) colors.set(hex, hex);
+    }
+    // Computed styles for all body elements
+    doc.body.querySelectorAll('*').forEach(el => {
+      if (el.hasAttribute('data-cw-handle')) return;
+      const cs = doc.defaultView.getComputedStyle(el);
+      add(cs.color);
+      add(cs.backgroundColor);
+      add(cs.borderTopColor);
+      add(cs.borderBottomColor);
+      add(cs.borderLeftColor);
+      add(cs.borderRightColor);
+    });
+    // CSS custom properties from stylesheets
+    try {
+      Array.from(doc.styleSheets).forEach(sheet => {
+        try {
+          Array.from(sheet.cssRules || []).forEach(rule => {
+            if (rule.style) {
+              for (let i = 0; i < rule.style.length; i++) {
+                const name = rule.style[i];
+                if (name.startsWith('--')) {
+                  const val = rule.style.getPropertyValue(name).trim();
+                  if (val.match(/^#[0-9a-f]{3,8}$/i) || val.match(/^rgb/i) || val.match(/^hsl/i)) add(val);
+                }
+              }
+            }
+          });
+        } catch(e) {}
+      });
+    } catch(e) {}
+
+    propsPalette.innerHTML = '';
+    const arr = Array.from(colors.values());
+    paletteCount.textContent = arr.length ? '(' + arr.length + ')' : '';
+    arr.forEach(hex => {
+      const sw = document.createElement('button');
+      sw.className = 'palette-swatch';
+      sw.style.backgroundColor = hex;
+      sw.title = hex;
+      // Click area (top half) copies hex
+      sw.addEventListener('click', async (e) => {
+        // If clicked on apply buttons, that handler runs first; here just copy
+        if (e.target.closest('.apply-buttons')) return;
+        try { await navigator.clipboard.writeText(hex); showToast('Copied ' + hex, 'success'); }
+        catch(err) { showToast(hex, 'success'); }
+      });
+      // Apply-to buttons (BG / Txt) shown on hover
+      const apply = document.createElement('div');
+      apply.className = 'apply-buttons';
+      const bgBtn = document.createElement('span');
+      bgBtn.textContent = 'BG'; bgBtn.title = 'Apply to background (or selected text if highlighted)';
+      bgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!selectedEl && !hasTextSelection()) { showToast('Click an element or select text first', 'error'); return; }
+        applyBg(hex); propsBgPicker.value = hex; propsBgText.value = hex;
+      });
+      const fgBtn = document.createElement('span');
+      fgBtn.textContent = 'Txt'; fgBtn.title = 'Apply to text color (or selected text if highlighted)';
+      fgBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (!selectedEl && !hasTextSelection()) { showToast('Click an element or select text first', 'error'); return; }
+        applyFg(hex); propsFgPicker.value = hex; propsFgText.value = hex;
+      });
+      apply.appendChild(bgBtn);
+      apply.appendChild(fgBtn);
+      sw.appendChild(apply);
+      propsPalette.appendChild(sw);
+    });
+  }
+
+  document.getElementById('palette-rebuild').addEventListener('click', buildPagePalette);
+
+  // ---------- Background image controls ----------
+  const bgImgSection = document.getElementById('bg-img-section');
+  const bgImgPreview = document.getElementById('bg-img-preview');
+  const bgImgUrl = document.getElementById('bg-img-url');
+  const bgImgClear = document.getElementById('bg-img-clear');
+  const bgImgAdd = document.getElementById('bg-img-add');
+  const bgImgSize = document.getElementById('bg-img-size');
+  const bgImgPosition = document.getElementById('bg-img-position');
+  const bgImgRepeat = document.getElementById('bg-img-repeat');
+  const bgImgAttachment = document.getElementById('bg-img-attachment');
+
+  function parseBgImageUrl(bg) {
+    if (!bg || bg === 'none') return '';
+    // First url() — handles single + multi-bg layered values (uses the topmost layer)
+    const m = bg.match(/url\((['"]?)(.*?)\1\)/);
+    return m ? m[2] : '';
+  }
+  function normalizeBgPosition(v) {
+    v = (v || '').trim();
+    const map = {
+      '0% 0%': 'left top', '50% 0%': 'center top', '100% 0%': 'right top',
+      '0% 50%': 'left center', '50% 50%': 'center center', '100% 50%': 'right center',
+      '0% 100%': 'left bottom', '50% 100%': 'center bottom', '100% 100%': 'right bottom'
+    };
+    return map[v] || '';
+  }
+  function setSelectFromValue(select, val) {
+    // Set if option exists; otherwise leave at empty
+    const has = Array.from(select.options).some(o => o.value === val);
+    select.value = has ? val : '';
+  }
+
+  function refreshBgImagePanel() {
+    if (!selectedEl || !frame.contentDocument) {
+      bgImgSection.classList.remove('has-image');
+      bgImgUrl.value = '';
+      bgImgPreview.style.backgroundImage = '';
+      return;
+    }
+    const cs = frame.contentDocument.defaultView.getComputedStyle(selectedEl);
+    const url = parseBgImageUrl(cs.backgroundImage);
+    if (url) {
+      bgImgSection.classList.add('has-image');
+      bgImgUrl.value = url;
+      bgImgPreview.style.backgroundImage = 'url("' + url.replace(/"/g, '\\"') + '")';
+      bgImgPreview.style.backgroundSize = 'cover';
+      bgImgPreview.style.backgroundPosition = 'center';
+      // Read current attributes
+      const sizeRaw = (cs.backgroundSize || '').trim();
+      const sizeOpt = ['cover','contain','100% 100%'].includes(sizeRaw) ? sizeRaw : '';
+      setSelectFromValue(bgImgSize, sizeOpt);
+      const posOpt = normalizeBgPosition(cs.backgroundPosition);
+      setSelectFromValue(bgImgPosition, posOpt);
+      const rep = (cs.backgroundRepeat || '').trim();
+      setSelectFromValue(bgImgRepeat, rep === 'repeat' ? '' : rep);
+      const att = (cs.backgroundAttachment || '').trim();
+      setSelectFromValue(bgImgAttachment, ['fixed','local'].includes(att) ? att : '');
+    } else {
+      bgImgSection.classList.remove('has-image');
+      bgImgUrl.value = '';
+      bgImgPreview.style.backgroundImage = '';
+    }
+  }
+
+  function setBgImageUrl(url) {
+    if (!selectedEl) return;
+    if (url) {
+      selectedEl.style.backgroundImage = 'url("' + url.replace(/"/g, '\\"') + '")';
+      bgImgPreview.style.backgroundImage = 'url("' + url.replace(/"/g, '\\"') + '")';
+      bgImgSection.classList.add('has-image');
+    } else {
+      // Clear all bg-image-related properties
+      ['background-image','background-size','background-position','background-repeat','background-attachment'].forEach(p => selectedEl.style.removeProperty(p));
+      bgImgSection.classList.remove('has-image');
+      bgImgUrl.value = '';
+      bgImgPreview.style.backgroundImage = '';
+    }
+  }
+
+  bgImgAdd.addEventListener('click', () => {
+    if (!selectedEl) { showToast('Click an element first', 'error'); return; }
+    const url = prompt('Background image URL:', '');
+    if (!url) return;
+    setBgImageUrl(url.trim());
+    // Sensible defaults for hero-style images
+    selectedEl.style.backgroundSize = 'cover';
+    selectedEl.style.backgroundPosition = 'center center';
+    selectedEl.style.backgroundRepeat = 'no-repeat';
+    refreshBgImagePanel();
+  });
+  bgImgUrl.addEventListener('change', () => {
+    if (!selectedEl) return;
+    const u = bgImgUrl.value.trim();
+    setBgImageUrl(u);
+  });
+  bgImgClear.addEventListener('click', () => {
+    if (!selectedEl) return;
+    setBgImageUrl('');
+  });
+  bgImgSize.addEventListener('change', () => {
+    if (!selectedEl) return;
+    if (bgImgSize.value) selectedEl.style.backgroundSize = bgImgSize.value;
+    else selectedEl.style.removeProperty('background-size');
+  });
+  bgImgPosition.addEventListener('change', () => {
+    if (!selectedEl) return;
+    if (bgImgPosition.value) selectedEl.style.backgroundPosition = bgImgPosition.value;
+    else selectedEl.style.removeProperty('background-position');
+  });
+  bgImgRepeat.addEventListener('change', () => {
+    if (!selectedEl) return;
+    if (bgImgRepeat.value) selectedEl.style.backgroundRepeat = bgImgRepeat.value;
+    else selectedEl.style.removeProperty('background-repeat');
+  });
+  bgImgAttachment.addEventListener('change', () => {
+    if (!selectedEl) return;
+    if (bgImgAttachment.value) selectedEl.style.backgroundAttachment = bgImgAttachment.value;
+    else selectedEl.style.removeProperty('background-attachment');
+  });
+
+  // Hook iframe click to update panel
+  function onIframeSelect(target) {
+    if (!frame.contentDocument) return;
+    const el = findEditableAncestor(target, frame.contentDocument);
+    if (el) setSelectedElement(el);
+  }
+
+  // Patch into the existing setupImageEditing click handler by intercepting clicks on the iframe doc.
+  // We register a fresh listener that runs after image handling.
+  const origLoad = frame.onload;
+  // The frame.onload is set in loadHTML. We instead hook via setupImageEditing which already runs there.
+  // Add a dedicated listener that fires for any click and updates the panel.
+  const setupPanelListeners = (doc) => {
+    doc.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t && t.hasAttribute && t.hasAttribute('data-cw-handle')) return;
+      onIframeSelect(t);
+      captureIframeSelection();
+      updateSelectionHints();
+    }, true); // capture phase so we run before/independently of image handler
+    doc.addEventListener('mouseup', () => {
+      captureIframeSelection();
+      updateSelectionHints();
+    });
+    doc.addEventListener('keyup', () => {
+      const sel = doc.getSelection();
+      if (sel && sel.anchorNode) onIframeSelect(sel.anchorNode);
+      captureIframeSelection();
+      updateSelectionHints();
+    });
+  };
+
+  function updateSelectionHints() {
+    document.body.classList.toggle('has-text-selection', hasTextSelection());
+  }
+
+  // Wrap the existing setupImageEditing to also call setupPanelListeners + buildPagePalette
+  const _origSetupImageEditing = setupImageEditing;
+  setupImageEditing = function(doc) {
+    _origSetupImageEditing(doc);
+    setupPanelListeners(doc);
+    setTimeout(() => { if (document.body.classList.contains('panel-open')) buildPagePalette(); }, 50);
+  };
+
+  // ---------- Split-view draggable divider (v1.5, Item 2C) ----------
+  // Resets to 50/50 every session — no localStorage. Double-click on the divider
+  // also resets to 50/50.
+  //
+  // Drag-bug fix (post-Phase-1): the original handler used document mousemove/mouseup
+  // listeners. When the user dragged the mouse over the iframe, the iframe's own
+  // document captured the events, so mouseup never fired in the parent — leaving
+  // the drag stuck and the divider following the mouse without a click. This version:
+  //   - Disables pointer events on iframe + CodeMirror during drag (events stay in parent)
+  //   - Adds safety-net handlers (mouseleave on document, blur on window) so a stuck
+  //     drag self-recovers if the mouse leaves the window or focus is lost
+  //   - Uses requestAnimationFrame to throttle layout work for smooth dragging
+  (function setupSplitDivider() {
+    const divider = document.getElementById('split-divider');
+    if (!divider) return;
+    let splitRatio = 50;
+    let rafId = null;
+
+    function applySplitRatio() {
+      const left = Math.max(15, Math.min(85, splitRatio));
+      document.body.style.setProperty('--split-left', left + '%');
+      document.body.style.setProperty('--split-right', (100 - left) + '%');
+    }
+
+    function startDrag(startEvent) {
+      if (state.view !== 'split') return;
+      startEvent.preventDefault();
+      divider.classList.add('dragging');
+      // Block iframe + CodeMirror from capturing mouse events during the drag
+      const cmEl = document.querySelector('.CodeMirror');
+      const prevIframePE = frame.style.pointerEvents;
+      const prevCmPE = cmEl ? cmEl.style.pointerEvents : '';
+      frame.style.pointerEvents = 'none';
+      if (cmEl) cmEl.style.pointerEvents = 'none';
+
+      const main = document.querySelector('main');
+      const rect = main.getBoundingClientRect();
+
+      function onMove(ev) {
+        const newRatio = ((ev.clientX - rect.left) / rect.width) * 100;
+        splitRatio = Math.max(15, Math.min(85, newRatio));
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          applySplitRatio();
+          if (cm) cm.refresh();
+          rafId = null;
+        });
+      }
+
+      function endDrag() {
+        divider.classList.remove('dragging');
+        frame.style.pointerEvents = prevIframePE;
+        if (cmEl) cmEl.style.pointerEvents = prevCmPE;
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', endDrag);
+        document.removeEventListener('mouseleave', endDrag);
+        window.removeEventListener('blur', endDrag);
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        // Final settle pass so the last frame doesn't get lost
+        applySplitRatio();
+        if (cm) cm.refresh();
+      }
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('mouseleave', endDrag);
+      window.addEventListener('blur', endDrag);
+    }
+
+    divider.addEventListener('mousedown', startDrag);
+    divider.addEventListener('dblclick', () => {
+      splitRatio = 50;
+      applySplitRatio();
+      if (cm) cm.refresh();
+    });
+  })();
+
+  // ---------- Refresh / unload warning (v1.5) ----------
+  // The visible amber pill in the header is the always-on prominent reminder.
+  // beforeunload is the safety net — when the user has loaded content, the browser
+  // pops its native "leave site?" dialog if they try to refresh or close the tab.
+  window.addEventListener('beforeunload', (e) => {
+    if (state.loaded) {
+      e.preventDefault();
+      e.returnValue = ''; // modern browsers ignore custom strings, but presence triggers the dialog
+      return '';
+    }
+  });
+
+  // ---------- Type Styles Panel (v1.5, Item 4 — part 1: panel + read/write/edit) ----------
+  // Manages page-wide typography via a dedicated <style id="cw-type-styles"> block
+  // in the page head (or top of body for fragments). The block is the single source
+  // of truth — read it on tab activation, write it on every change. Travels with the
+  // saved HTML so styles persist anywhere the file is hosted (host-agnostic, Item 5c).
+  //
+  // Round-trip export / import (CSS / JSON / natural-language brief) lands in part 2.
+  const TYPE_ELEMENTS = [
+    { id: 'h1',         label: 'Heading 1',       selector: 'h1',          inherits: 'headline' },
+    { id: 'h2',         label: 'Heading 2',       selector: 'h2',          inherits: 'headline' },
+    { id: 'h3',         label: 'Heading 3',       selector: 'h3',          inherits: 'headline' },
+    { id: 'h4',         label: 'Heading 4',       selector: 'h4',          inherits: 'headline' },
+    { id: 'h5',         label: 'Heading 5',       selector: 'h5',          inherits: 'headline' },
+    { id: 'h6',         label: 'Heading 6',       selector: 'h6',          inherits: 'headline' },
+    { id: 'p',          label: 'Paragraph',       selector: 'p',           inherits: 'content' },
+    { id: 'lists',      label: 'Lists',           selector: 'ul, ol, li',  inherits: 'content' },
+    { id: 'a',          label: 'Hyperlink',       selector: 'a',           inherits: 'content' },
+    { id: 'a-h',        label: 'Link in heading', selector: 'h1 a, h2 a, h3 a, h4 a, h5 a, h6 a', inherits: 'headline' },
+    { id: 'a-li',       label: 'Link in list',    selector: 'li a',        inherits: 'content' },
+    { id: 'blockquote', label: 'Blockquote',      selector: 'blockquote',  inherits: 'content' },
+    { id: 'pre',        label: 'Preformatted',    selector: 'pre, code',   inherits: 'content' }
+  ];
+  const TYPE_PROP_TO_CSS = {
+    fontFamily: 'font-family',
+    color: 'color',
+    fontSize: 'font-size',
+    fontWeight: 'font-weight',
+    lineHeight: 'line-height'
+  };
+  const TYPE_CSS_TO_PROP = {};
+  Object.keys(TYPE_PROP_TO_CSS).forEach(k => { TYPE_CSS_TO_PROP[TYPE_PROP_TO_CSS[k]] = k; });
+  const TYPE_STYLE_BLOCK_ID = 'cw-type-styles';
+  const TYPE_GOOGLE_FONTS_LINK_ID = 'cw-google-fonts';
+
+  // Master selectors — used to read/write page-wide defaults from the cw-type-styles
+  // block. Element rules emitted *after* these in source order so per-element values
+  // win the cascade.
+  const MASTER_HEADLINE_SELECTOR = 'h1, h2, h3, h4, h5, h6';
+  const MASTER_BODY_SELECTOR = 'body';
+  const MASTER_LINK_SELECTOR = 'a';
+  const MASTER_SECTION_MARKER = '/* === Element overrides === */';
+
+  // Curated top-40 Google Fonts — covers the workhorses across sans, serif, display,
+  // and mono. Users can also type any font name from fonts.google.com via the
+  // picker's "Other" field; that font joins the page's <link id="cw-google-fonts">.
+  const GOOGLE_FONT_PRESETS = [
+    // Sans
+    { name: 'Inter', stack: '"Inter", sans-serif', cat: 'Sans' },
+    { name: 'Roboto', stack: '"Roboto", sans-serif', cat: 'Sans' },
+    { name: 'Open Sans', stack: '"Open Sans", sans-serif', cat: 'Sans' },
+    { name: 'Lato', stack: '"Lato", sans-serif', cat: 'Sans' },
+    { name: 'Montserrat', stack: '"Montserrat", sans-serif', cat: 'Sans' },
+    { name: 'Poppins', stack: '"Poppins", sans-serif', cat: 'Sans' },
+    { name: 'Raleway', stack: '"Raleway", sans-serif', cat: 'Sans' },
+    { name: 'Nunito', stack: '"Nunito", sans-serif', cat: 'Sans' },
+    { name: 'Source Sans 3', stack: '"Source Sans 3", sans-serif', cat: 'Sans' },
+    { name: 'Work Sans', stack: '"Work Sans", sans-serif', cat: 'Sans' },
+    { name: 'Manrope', stack: '"Manrope", sans-serif', cat: 'Sans' },
+    { name: 'DM Sans', stack: '"DM Sans", sans-serif', cat: 'Sans' },
+    { name: 'Plus Jakarta Sans', stack: '"Plus Jakarta Sans", sans-serif', cat: 'Sans' },
+    { name: 'Outfit', stack: '"Outfit", sans-serif', cat: 'Sans' },
+    { name: 'Quicksand', stack: '"Quicksand", sans-serif', cat: 'Sans' },
+    { name: 'Karla', stack: '"Karla", sans-serif', cat: 'Sans' },
+    { name: 'Mulish', stack: '"Mulish", sans-serif', cat: 'Sans' },
+    { name: 'Barlow', stack: '"Barlow", sans-serif', cat: 'Sans' },
+    { name: 'Rubik', stack: '"Rubik", sans-serif', cat: 'Sans' },
+    { name: 'Oswald', stack: '"Oswald", sans-serif', cat: 'Sans' },
+    // Serif
+    { name: 'Playfair Display', stack: '"Playfair Display", serif', cat: 'Serif' },
+    { name: 'Merriweather', stack: '"Merriweather", serif', cat: 'Serif' },
+    { name: 'Lora', stack: '"Lora", serif', cat: 'Serif' },
+    { name: 'PT Serif', stack: '"PT Serif", serif', cat: 'Serif' },
+    { name: 'Libre Baskerville', stack: '"Libre Baskerville", serif', cat: 'Serif' },
+    { name: 'EB Garamond', stack: '"EB Garamond", serif', cat: 'Serif' },
+    { name: 'Cormorant Garamond', stack: '"Cormorant Garamond", serif', cat: 'Serif' },
+    { name: 'Libre Bodoni', stack: '"Libre Bodoni", serif', cat: 'Serif' },
+    { name: 'DM Serif Display', stack: '"DM Serif Display", serif', cat: 'Serif' },
+    { name: 'Bitter', stack: '"Bitter", serif', cat: 'Serif' },
+    { name: 'Source Serif 4', stack: '"Source Serif 4", serif', cat: 'Serif' },
+    { name: 'Crimson Text', stack: '"Crimson Text", serif', cat: 'Serif' },
+    // Display
+    { name: 'Bebas Neue', stack: '"Bebas Neue", sans-serif', cat: 'Display' },
+    { name: 'Anton', stack: '"Anton", sans-serif', cat: 'Display' },
+    { name: 'Abril Fatface', stack: '"Abril Fatface", serif', cat: 'Display' },
+    { name: 'Pacifico', stack: '"Pacifico", cursive', cat: 'Display' },
+    { name: 'Lobster', stack: '"Lobster", cursive', cat: 'Display' },
+    // Mono
+    { name: 'JetBrains Mono', stack: '"JetBrains Mono", monospace', cat: 'Mono' },
+    { name: 'Fira Code', stack: '"Fira Code", monospace', cat: 'Mono' },
+    { name: 'IBM Plex Mono', stack: '"IBM Plex Mono", monospace', cat: 'Mono' }
+  ];
+  const SYSTEM_FONT_PRESETS = [
+    { name: 'System UI (default)', stack: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', cat: 'System' },
+    { name: 'Helvetica', stack: '"Helvetica Neue", Helvetica, Arial, sans-serif', cat: 'System' },
+    { name: 'Arial', stack: 'Arial, Helvetica, sans-serif', cat: 'System' },
+    { name: 'Georgia', stack: 'Georgia, "Times New Roman", serif', cat: 'System' },
+    { name: 'Times New Roman', stack: '"Times New Roman", Times, serif', cat: 'System' },
+    { name: 'Courier New', stack: '"Courier New", Courier, monospace', cat: 'System' },
+    { name: 'SF Mono', stack: '"SF Mono", Menlo, Consolas, monospace', cat: 'System' }
+  ];
+  // Set of known Google Font names (mutable — augmented when users pick custom names).
+  const knownGoogleFonts = new Set(GOOGLE_FONT_PRESETS.map(f => f.name));
+
+  // Holds active master settings + per-element overrides.
+  // Shape: { _master: { headlineFamily, contentFamily, textColor, linkColor }, h1: {...}, ... }
+  let typeStyles = { _master: {} };
+  let editorPreviewFontsLoaded = false;
+
+  function normalizeSelector(sel) {
+    return sel.trim().replace(/\s*,\s*/g, ', ').replace(/\s+/g, ' ');
+  }
+
+  function parsePropBlock(propText) {
+    const props = {};
+    propText.split(';').forEach(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx === -1) return;
+      const cssProp = line.substring(0, colonIdx).trim();
+      const value = line.substring(colonIdx + 1).trim();
+      if (TYPE_CSS_TO_PROP[cssProp] && value) props[TYPE_CSS_TO_PROP[cssProp]] = value;
+    });
+    return props;
+  }
+
+  function parseMasterRules(text) {
+    const stripped = text.replace(/\/\*[\s\S]*?\*\//g, '');
+    const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+    const master = {};
+    let match;
+    while ((match = ruleRe.exec(stripped)) !== null) {
+      const sel = normalizeSelector(match[1]);
+      const props = parsePropBlock(match[2]);
+      if (sel === MASTER_BODY_SELECTOR) {
+        if (props.fontFamily) master.contentFamily = props.fontFamily;
+        if (props.color) master.textColor = props.color;
+      } else if (sel === MASTER_HEADLINE_SELECTOR) {
+        if (props.fontFamily) master.headlineFamily = props.fontFamily;
+      } else if (sel === MASTER_LINK_SELECTOR) {
+        if (props.color) master.linkColor = props.color;
+      }
+    }
+    return master;
+  }
+
+  function parseElementRules(text) {
+    const stripped = text.replace(/\/\*[\s\S]*?\*\//g, '');
+    const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+    const result = {};
+    let match;
+    while ((match = ruleRe.exec(stripped)) !== null) {
+      const sel = normalizeSelector(match[1]);
+      const elem = TYPE_ELEMENTS.find(e => normalizeSelector(e.selector) === sel);
+      if (!elem) continue;
+      const props = parsePropBlock(match[2]);
+      if (Object.keys(props).length > 0) result[elem.id] = props;
+    }
+    return result;
+  }
+
+  function readTypeStylesFromPage() {
+    if (!frame.contentDocument) return { _master: {} };
+    const block = frame.contentDocument.getElementById(TYPE_STYLE_BLOCK_ID);
+    if (!block) return { _master: {} };
+    const fullText = block.textContent || '';
+    const idx = fullText.indexOf(MASTER_SECTION_MARKER);
+    let masterText, elemText;
+    if (idx >= 0) {
+      masterText = fullText.substring(0, idx);
+      elemText = fullText.substring(idx + MASTER_SECTION_MARKER.length);
+    } else {
+      // Legacy block authored before v1.5 master support — treat all as element rules.
+      masterText = '';
+      elemText = fullText;
+    }
+    const result = parseElementRules(elemText);
+    result._master = parseMasterRules(masterText);
+    return result;
+  }
+
+  function generateMasterRules() {
+    const m = typeStyles._master || {};
+    const blocks = [];
+    const bodyLines = [];
+    if (m.contentFamily) bodyLines.push('  font-family: ' + m.contentFamily + ';');
+    if (m.textColor) bodyLines.push('  color: ' + m.textColor + ';');
+    if (bodyLines.length) blocks.push(MASTER_BODY_SELECTOR + ' {\n' + bodyLines.join('\n') + '\n}');
+    if (m.headlineFamily) {
+      blocks.push(MASTER_HEADLINE_SELECTOR + ' {\n  font-family: ' + m.headlineFamily + ';\n}');
+    }
+    if (m.linkColor) {
+      blocks.push(MASTER_LINK_SELECTOR + ' {\n  color: ' + m.linkColor + ';\n}');
+    }
+    return blocks.join('\n\n');
+  }
+
+  function generateElementRules() {
+    const rules = [];
+    TYPE_ELEMENTS.forEach(elem => {
+      const props = typeStyles[elem.id];
+      if (!props) return;
+      const lines = [];
+      Object.keys(TYPE_PROP_TO_CSS).forEach(p => {
+        const v = props[p];
+        if (v) lines.push('  ' + TYPE_PROP_TO_CSS[p] + ': ' + v + ';');
+      });
+      if (lines.length > 0) {
+        rules.push(elem.selector + ' {\n' + lines.join('\n') + '\n}');
+      }
+    });
+    return rules.join('\n\n');
+  }
+
+  function generateTypeCSS() {
+    const masterCSS = generateMasterRules();
+    const elemCSS = generateElementRules();
+    if (!masterCSS && !elemCSS) return '';
+    const parts = ['/* Camille type styles — managed by the Type Styles panel */'];
+    if (masterCSS) parts.push(masterCSS);
+    if (elemCSS) {
+      parts.push(MASTER_SECTION_MARKER);
+      parts.push(elemCSS);
+    }
+    return parts.join('\n\n');
+  }
+
+  // Scan typeStyles state for any font-family value that names a known Google Font.
+  function getReferencedGoogleFonts() {
+    const fonts = new Set();
+    const consider = (stack) => {
+      if (!stack) return;
+      const first = stack.split(',')[0].trim().replace(/^["']|["']$/g, '');
+      if (knownGoogleFonts.has(first)) fonts.add(first);
+    };
+    const m = typeStyles._master || {};
+    consider(m.headlineFamily);
+    consider(m.contentFamily);
+    TYPE_ELEMENTS.forEach(elem => {
+      const props = typeStyles[elem.id];
+      if (props) consider(props.fontFamily);
+    });
+    return Array.from(fonts);
+  }
+
+  // Maintain the iframe's <link id="cw-google-fonts"> tag so referenced Google Fonts
+  // load at usable weight ranges. Inserts in <head> for full pages, top of <body>
+  // for fragments (so the link travels with the saved file regardless).
+  function syncGoogleFontsLink() {
+    if (!frame.contentDocument) return;
+    const doc = frame.contentDocument;
+    const fonts = getReferencedGoogleFonts();
+    let link = doc.getElementById(TYPE_GOOGLE_FONTS_LINK_ID);
+    if (fonts.length === 0) {
+      if (link) link.remove();
+      return;
+    }
+    const params = fonts.map(f =>
+      'family=' + encodeURIComponent(f).replace(/%20/g, '+') + ':wght@300;400;500;600;700'
+    ).join('&');
+    const href = 'https://fonts.googleapis.com/css2?' + params + '&display=swap';
+    if (!link) {
+      link = doc.createElement('link');
+      link.id = TYPE_GOOGLE_FONTS_LINK_ID;
+      link.rel = 'stylesheet';
+      if (state.isFragment) {
+        doc.body.insertBefore(link, doc.body.firstChild);
+      } else if (doc.head) {
+        doc.head.appendChild(link);
+      } else {
+        doc.body.insertBefore(link, doc.body.firstChild);
+      }
+    }
+    if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+  }
+
+  // On file load, harvest any font names already in cw-google-fonts so the picker
+  // recognizes them as Google fonts going forward (custom names from prior sessions).
+  function registerGoogleFontsFromPage() {
+    if (!frame.contentDocument) return;
+    const link = frame.contentDocument.getElementById(TYPE_GOOGLE_FONTS_LINK_ID);
+    if (!link) return;
+    const href = link.getAttribute('href') || '';
+    const matches = href.match(/family=([^&]+)/g) || [];
+    matches.forEach(m => {
+      const raw = m.replace(/^family=/, '').split(':')[0];
+      const name = decodeURIComponent(raw.replace(/\+/g, ' '));
+      if (name) knownGoogleFonts.add(name);
+    });
+  }
+
+  function writeTypeStylesToPage() {
+    if (!frame.contentDocument) return;
+    const doc = frame.contentDocument;
+    const css = generateTypeCSS();
+    let block = doc.getElementById(TYPE_STYLE_BLOCK_ID);
+    if (!css) {
+      if (block) block.remove();
+    } else {
+      if (!block) {
+        block = doc.createElement('style');
+        block.id = TYPE_STYLE_BLOCK_ID;
+        if (state.isFragment) {
+          // Fragment: prepend to body so it survives save (head won't be exported)
+          doc.body.insertBefore(block, doc.body.firstChild);
+        } else if (doc.head) {
+          doc.head.appendChild(block);
+        } else {
+          doc.body.insertBefore(block, doc.body.firstChild);
+        }
+      }
+      block.textContent = css;
+    }
+    // Keep Google Fonts <link> in sync with the fonts referenced in the spec.
+    syncGoogleFontsLink();
+    // Push to source pane if visible so the user sees the change reflected in code
+    if (state.view === 'source' || state.view === 'split') {
+      try { setSourceText(getCurrentHTML()); rebuildSourcePositions(); } catch(e) {}
+    }
+  }
+
+  // Returns the human-readable first name from a font-family stack, e.g.
+  // '"Playfair Display", serif' → 'Playfair Display'. Returns '' for falsy stacks.
+  function fontDisplayName(stack) {
+    if (!stack) return '';
+    return stack.split(',')[0].trim().replace(/^["']|["']$/g, '');
+  }
+
+  // What does a per-element row inherit when its font-family is blank? Either the
+  // master Headline (for h1-h6 and 'a-h') or the master Content (for everything
+  // else). Returns null if no master is set for that role.
+  function inheritedFontStackFor(elemId) {
+    const elem = TYPE_ELEMENTS.find(e => e.id === elemId);
+    if (!elem) return null;
+    const m = typeStyles._master || {};
+    return elem.inherits === 'headline' ? (m.headlineFamily || null) : (m.contentFamily || null);
+  }
+
+  function buildTypeRows() {
+    const container = document.getElementById('type-rows');
+    if (!container || container.dataset.built === '1') return;
+    TYPE_ELEMENTS.forEach(elem => {
+      const row = document.createElement('div');
+      row.className = 'type-row';
+      row.dataset.elem = elem.id;
+      row.innerHTML =
+        '<button class="type-row-toggle" type="button" aria-expanded="false">' +
+          '<span class="type-row-label">' + elem.label + '</span>' +
+          '<span class="type-row-summary"></span>' +
+          '<span class="type-row-chevron">›</span>' +
+        '</button>' +
+        '<div class="type-row-body">' +
+          '<label class="type-field"><span>Font family</span>' +
+            '<button class="font-select-btn" type="button" data-prop="fontFamily">' +
+              '<span class="font-select-name is-default">Inherit</span>' +
+              '<span class="font-select-chevron">▾</span>' +
+            '</button>' +
+          '</label>' +
+          '<label class="type-field"><span>Color</span>' +
+            '<div class="color-row">' +
+              '<input type="color" class="type-color-picker">' +
+              '<input type="text" data-prop="color" placeholder="inherit">' +
+            '</div>' +
+          '</label>' +
+          '<label class="type-field"><span>Font size</span>' +
+            '<input type="text" data-prop="fontSize" placeholder="e.g., 32px or 2rem">' +
+          '</label>' +
+          '<label class="type-field"><span>Font weight</span>' +
+            '<select data-prop="fontWeight">' +
+              '<option value="">— inherit</option>' +
+              '<option value="300">300 Light</option>' +
+              '<option value="400">400 Regular</option>' +
+              '<option value="500">500 Medium</option>' +
+              '<option value="600">600 Semibold</option>' +
+              '<option value="700">700 Bold</option>' +
+              '<option value="800">800 ExtraBold</option>' +
+            '</select>' +
+          '</label>' +
+          '<label class="type-field"><span>Line height</span>' +
+            '<input type="text" data-prop="lineHeight" placeholder="e.g., 1.5">' +
+          '</label>' +
+        '</div>';
+      container.appendChild(row);
+
+      const toggle = row.querySelector('.type-row-toggle');
+      toggle.addEventListener('click', () => {
+        const expanded = row.classList.toggle('expanded');
+        toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      });
+
+      // Font picker button — opens the modal with this element as the target.
+      const fontBtn = row.querySelector('.font-select-btn[data-prop="fontFamily"]');
+      fontBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const cur = (typeStyles[elem.id] && typeStyles[elem.id].fontFamily) || '';
+        openFontPicker({
+          currentValue: cur,
+          inheritedValue: inheritedFontStackFor(elem.id),
+          inheritedLabel: inheritedFontStackFor(elem.id) ? 'Inherits ' + (elem.inherits === 'headline' ? 'Headline' : 'Content') + ' Font: ' + fontDisplayName(inheritedFontStackFor(elem.id)) : null,
+          onSelect: (stack) => {
+            if (!typeStyles[elem.id]) typeStyles[elem.id] = {};
+            if (stack) typeStyles[elem.id].fontFamily = stack;
+            else delete typeStyles[elem.id].fontFamily;
+            if (Object.keys(typeStyles[elem.id]).length === 0) delete typeStyles[elem.id];
+            writeTypeStylesToPage();
+            refreshTypePanelFromState();
+          }
+        });
+      });
+
+      // Other text/number inputs and the weight select.
+      row.querySelectorAll('input[data-prop], select[data-prop]').forEach(input => {
+        if (input.dataset.prop === 'fontFamily') return; // handled by picker
+        input.addEventListener('input', () => {
+          const prop = input.dataset.prop;
+          const val = input.value.trim();
+          if (!typeStyles[elem.id]) typeStyles[elem.id] = {};
+          if (val) typeStyles[elem.id][prop] = val;
+          else delete typeStyles[elem.id][prop];
+          if (Object.keys(typeStyles[elem.id]).length === 0) delete typeStyles[elem.id];
+          writeTypeStylesToPage();
+          updateTypeRowSummary(elem.id);
+        });
+      });
+
+      const picker = row.querySelector('.type-color-picker');
+      const colorTxt = row.querySelector('input[data-prop="color"]');
+      picker.addEventListener('input', () => {
+        colorTxt.value = picker.value;
+        colorTxt.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
+    container.dataset.built = '1';
+  }
+
+  function refreshMasterSectionFromState() {
+    const m = typeStyles._master || {};
+    // Headline / Content font display
+    const headlineBtn = document.querySelector('.font-select-btn[data-master-field="headlineFamily"]');
+    const contentBtn = document.querySelector('.font-select-btn[data-master-field="contentFamily"]');
+    if (headlineBtn) {
+      const span = headlineBtn.querySelector('.font-select-name');
+      if (m.headlineFamily) {
+        span.textContent = fontDisplayName(m.headlineFamily);
+        span.classList.remove('is-default');
+        span.style.fontFamily = m.headlineFamily;
+      } else {
+        span.textContent = 'Default';
+        span.classList.add('is-default');
+        span.style.fontFamily = '';
+      }
+    }
+    if (contentBtn) {
+      const span = contentBtn.querySelector('.font-select-name');
+      if (m.contentFamily) {
+        span.textContent = fontDisplayName(m.contentFamily);
+        span.classList.remove('is-default');
+        span.style.fontFamily = m.contentFamily;
+      } else {
+        span.textContent = 'Default';
+        span.classList.add('is-default');
+        span.style.fontFamily = '';
+      }
+    }
+    // Text color + Link color
+    ['textColor', 'linkColor'].forEach(field => {
+      const txt = document.querySelector('.type-master input[type="text"][data-master-field="' + field + '"]');
+      const pick = document.querySelector('.type-master input[type="color"][data-master-field="' + field + '"]');
+      const v = m[field] || '';
+      if (txt) txt.value = v;
+      if (pick) pick.value = (v && /^#[0-9a-f]{6}$/i.test(v)) ? v.toLowerCase() : '#000000';
+    });
+  }
+
+  function refreshTypePanelFromState() {
+    refreshMasterSectionFromState();
+    TYPE_ELEMENTS.forEach(elem => {
+      const row = document.querySelector('.type-row[data-elem="' + elem.id + '"]');
+      if (!row) return;
+      const props = typeStyles[elem.id] || {};
+      // Font picker button display
+      const fontBtn = row.querySelector('.font-select-btn[data-prop="fontFamily"]');
+      if (fontBtn) {
+        const span = fontBtn.querySelector('.font-select-name');
+        if (props.fontFamily) {
+          span.textContent = fontDisplayName(props.fontFamily);
+          span.classList.remove('is-default');
+          span.style.fontFamily = props.fontFamily;
+        } else {
+          const inherited = inheritedFontStackFor(elem.id);
+          if (inherited) {
+            span.textContent = 'Inherits ' + (elem.inherits === 'headline' ? 'Headline' : 'Content') + ': ' + fontDisplayName(inherited);
+          } else {
+            span.textContent = 'Inherit (default)';
+          }
+          span.classList.add('is-default');
+          span.style.fontFamily = inherited || '';
+        }
+      }
+      // Other inputs
+      row.querySelectorAll('input[data-prop], select[data-prop]').forEach(input => {
+        if (input.dataset.prop === 'fontFamily') return;
+        const p = input.dataset.prop;
+        input.value = props[p] || '';
+      });
+      const colorTxt = row.querySelector('input[data-prop="color"]');
+      const picker = row.querySelector('.type-color-picker');
+      if (colorTxt && colorTxt.value && /^#[0-9a-f]{6}$/i.test(colorTxt.value)) {
+        picker.value = colorTxt.value.toLowerCase();
+      } else if (picker) {
+        picker.value = '#000000';
+      }
+      updateTypeRowSummary(elem.id);
+    });
+  }
+
+  function updateTypeRowSummary(elemId) {
+    const row = document.querySelector('.type-row[data-elem="' + elemId + '"]');
+    if (!row) return;
+    const summary = row.querySelector('.type-row-summary');
+    const props = typeStyles[elemId] || {};
+    const bits = [];
+    if (props.fontFamily) {
+      bits.push(fontDisplayName(props.fontFamily));
+    } else {
+      const inherited = inheritedFontStackFor(elemId);
+      if (inherited) bits.push('↳ ' + fontDisplayName(inherited));
+    }
+    if (props.fontSize) bits.push(props.fontSize);
+    if (props.fontWeight) bits.push(props.fontWeight);
+    summary.textContent = bits.join(' · ');
+    if (props.color) {
+      summary.classList.add('has-color');
+      summary.style.setProperty('--row-color', props.color);
+    } else {
+      summary.classList.remove('has-color');
+      summary.style.removeProperty('--row-color');
+    }
+  }
+
+  function hasAnyTypeStyles() {
+    const m = typeStyles._master || {};
+    if (m.headlineFamily || m.contentFamily || m.textColor || m.linkColor) return true;
+    return TYPE_ELEMENTS.some(e => typeStyles[e.id]);
+  }
+
+  function clearAllTypeStyles() {
+    if (!hasAnyTypeStyles()) { showToast('Nothing to clear', 'success'); return; }
+    if (!confirm('Remove all type styles (master + per-element) from this page? This cannot be undone.')) return;
+    typeStyles = { _master: {} };
+    writeTypeStylesToPage();
+    refreshTypePanelFromState();
+    showToast('Type styles cleared', 'success');
+  }
+
+  function activateTypeTab() {
+    if (!state.loaded) {
+      typeStyles = { _master: {} };
+    } else {
+      registerGoogleFontsFromPage();
+      typeStyles = readTypeStylesFromPage();
+      if (!typeStyles._master) typeStyles._master = {};
+    }
+    buildTypeRows();
+    refreshTypePanelFromState();
+  }
+
+  // Tab switching for the props panel
+  document.querySelectorAll('.panel-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const name = tab.dataset.tab;
+      document.querySelectorAll('.panel-tab').forEach(t => t.classList.toggle('active', t === tab));
+      document.querySelectorAll('#props-panel .panel-tab-pane').forEach(p => {
+        p.classList.toggle('active', p.dataset.pane === name);
+      });
+      if (name === 'type') activateTypeTab();
+    });
+  });
+
+  document.getElementById('type-clear').addEventListener('click', clearAllTypeStyles);
+  document.getElementById('type-export').addEventListener('click', () => {
+    showToast('Export coming in the next update', 'success');
+  });
+  document.getElementById('type-import').addEventListener('click', () => {
+    showToast('Import coming in the next update', 'success');
+  });
+
+  // ---------- Master controls wiring (v1.5) ----------
+  function setMasterField(field, value) {
+    if (!typeStyles._master) typeStyles._master = {};
+    if (value) typeStyles._master[field] = value;
+    else delete typeStyles._master[field];
+    writeTypeStylesToPage();
+    refreshTypePanelFromState();
+  }
+
+  // Headline / Content font selectors (open the picker, target the master).
+  document.querySelectorAll('.font-select-btn[data-master-field]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const field = btn.dataset.masterField;
+      const cur = (typeStyles._master && typeStyles._master[field]) || '';
+      openFontPicker({
+        currentValue: cur,
+        title: field === 'headlineFamily' ? 'Headline Font (H1–H6)' : 'Content Font (body, paragraphs, lists)',
+        onSelect: (stack) => setMasterField(field, stack)
+      });
+    });
+  });
+
+  // Text / Link color text inputs.
+  document.querySelectorAll('.type-master input[type="text"][data-master-field]').forEach(input => {
+    input.addEventListener('input', () => {
+      setMasterField(input.dataset.masterField, input.value.trim());
+    });
+  });
+  // Their paired color-picker swatches.
+  document.querySelectorAll('.type-master input[type="color"][data-master-field]').forEach(picker => {
+    picker.addEventListener('input', () => {
+      const field = picker.dataset.masterField;
+      const txt = document.querySelector('.type-master input[type="text"][data-master-field="' + field + '"]');
+      if (txt) {
+        txt.value = picker.value;
+        txt.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
+  // Per-field clear (× buttons).
+  document.querySelectorAll('.type-master [data-master-clear]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setMasterField(btn.dataset.masterClear, '');
+    });
+  });
+
+  // ---------- Font picker modal (v1.5) ----------
+  // Opens with an `opts` object: { currentValue, onSelect, title?, inheritedLabel? }.
+  // Builds preview list lazily — first open injects all curated Google Fonts at
+  // weight 400 into the editor's own <head> so each item renders in its typeface.
+  const fontPickerModal = document.getElementById('font-picker-modal');
+  const fontPickerSearch = document.getElementById('font-picker-search');
+  const fontPickerList = document.getElementById('font-picker-list');
+  const fontPickerCustomName = document.getElementById('font-picker-custom-name');
+  let fontPickerCtx = null;
+
+  function loadEditorPreviewFonts() {
+    if (editorPreviewFontsLoaded) return;
+    editorPreviewFontsLoaded = true;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.id = 'cw-editor-preview-fonts';
+    const params = GOOGLE_FONT_PRESETS.map(f =>
+      'family=' + encodeURIComponent(f.name).replace(/%20/g, '+') + ':wght@400'
+    ).join('&');
+    link.href = 'https://fonts.googleapis.com/css2?' + params + '&display=swap';
+    document.head.appendChild(link);
+  }
+
+  function buildFontPickerList(query) {
+    const q = (query || '').trim().toLowerCase();
+    const cur = fontPickerCtx ? (fontPickerCtx.currentValue || '') : '';
+    const curName = fontDisplayName(cur);
+    const matches = (item) => !q || item.name.toLowerCase().includes(q);
+
+    const sections = [];
+    // Default / inherit option always at top
+    if (fontPickerCtx && fontPickerCtx.inheritedLabel) {
+      sections.push({
+        label: 'Default',
+        items: [{ name: fontPickerCtx.inheritedLabel, stack: '', __isDefault: true, source: 'INHERIT' }]
+      });
+    } else {
+      sections.push({
+        label: 'Default',
+        items: [{ name: 'Default (no font set)', stack: '', __isDefault: true, source: 'DEFAULT' }]
+      });
+    }
+    // Group Google fonts by category
+    const categoryOrder = ['Sans', 'Serif', 'Display', 'Mono'];
+    categoryOrder.forEach(cat => {
+      const items = GOOGLE_FONT_PRESETS.filter(f => f.cat === cat && matches(f));
+      if (items.length) sections.push({ label: 'Google · ' + cat, items: items.map(f => ({ ...f, source: 'GOOGLE' })) });
+    });
+    // System fonts
+    const systemItems = SYSTEM_FONT_PRESETS.filter(matches);
+    if (systemItems.length) sections.push({ label: 'System', items: systemItems.map(f => ({ ...f, source: 'SYSTEM' })) });
+
+    // Render
+    fontPickerList.innerHTML = '';
+    let totalItems = 0;
+    sections.forEach(sec => {
+      if (!sec.items.length) return;
+      totalItems += sec.items.length;
+      const lbl = document.createElement('div');
+      lbl.className = 'picker-section-label';
+      lbl.textContent = sec.label;
+      fontPickerList.appendChild(lbl);
+      sec.items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'picker-item';
+        if (item.__isDefault && !cur) btn.classList.add('is-selected');
+        else if (curName && fontDisplayName(item.stack) === curName) btn.classList.add('is-selected');
+        if (item.stack) btn.style.fontFamily = item.stack;
+        btn.innerHTML =
+          '<span class="picker-item-name">' + escapeHtml(item.name) + '</span>' +
+          '<span class="picker-source">' + item.source + '</span>';
+        btn.addEventListener('click', () => applyFontFromPicker(item.stack));
+        fontPickerList.appendChild(btn);
+      });
+    });
+    if (totalItems === 1 && q) {
+      // Only the default option matched the search — show empty hint
+      const empty = document.createElement('div');
+      empty.className = 'picker-empty';
+      empty.innerHTML = 'No fonts match "<strong>' + escapeHtml(q) + '</strong>". Try the <em>Other</em> field below to use any Google Font name.';
+      fontPickerList.appendChild(empty);
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function openFontPicker(opts) {
+    fontPickerCtx = opts || {};
+    loadEditorPreviewFonts();
+    const titleEl = document.getElementById('font-picker-title');
+    if (titleEl) titleEl.textContent = opts.title || 'Choose a font';
+    fontPickerSearch.value = '';
+    fontPickerCustomName.value = '';
+    buildFontPickerList('');
+    fontPickerModal.classList.add('open');
+    setTimeout(() => fontPickerSearch.focus(), 0);
+  }
+  function closeFontPicker() {
+    fontPickerModal.classList.remove('open');
+    fontPickerCtx = null;
+  }
+  function applyFontFromPicker(stack) {
+    if (fontPickerCtx && typeof fontPickerCtx.onSelect === 'function') {
+      fontPickerCtx.onSelect(stack || '');
+    }
+    closeFontPicker();
+  }
+  function applyCustomFontName() {
+    const name = fontPickerCustomName.value.trim();
+    if (!name) return;
+    // Treat any custom-typed name as a Google Font: register it and load it.
+    knownGoogleFonts.add(name);
+    // Build a stack with a sensible fallback — if the name suggests a serif/mono,
+    // adjust the fallback. Otherwise default to sans-serif.
+    const lower = name.toLowerCase();
+    let fallback = 'sans-serif';
+    if (/(serif|garamond|baskerville|playfair|bodoni|merriweather|lora|times)/.test(lower)) fallback = 'serif';
+    else if (/(mono|code|courier|consolas)/.test(lower)) fallback = 'monospace';
+    const stack = '"' + name + '", ' + fallback;
+    applyFontFromPicker(stack);
+  }
+
+  fontPickerSearch.addEventListener('input', () => buildFontPickerList(fontPickerSearch.value));
+  fontPickerSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeFontPicker();
+  });
+  fontPickerCustomName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyCustomFontName(); }
+    else if (e.key === 'Escape') closeFontPicker();
+  });
+  document.getElementById('font-picker-custom-apply').addEventListener('click', applyCustomFontName);
+  document.getElementById('font-picker-clear').addEventListener('click', () => applyFontFromPicker(''));
+  document.getElementById('font-picker-cancel').addEventListener('click', closeFontPicker);
+  fontPickerModal.addEventListener('click', (e) => {
+    if (e.target === fontPickerModal) closeFontPicker();
+  });
+
+})();
+</script>
+</body>
+</html>
+    })
