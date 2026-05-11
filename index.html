@@ -2398,7 +2398,30 @@
     gap: 8px;
   }
   #media-pane .media-radius-row input[type="range"] { flex: 1; }
-  #media-pane .media-radius-row span {
+  #media-pane .media-link-target {
+    display: flex;
+    gap: 14px;
+    margin-top: 4px;
+    padding: 6px 10px;
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+  #media-pane .media-link-target label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: normal;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  #media-pane .media-link-target input[type="radio"] {
+    margin: 0;
+  }
+    #media-pane .media-radius-row span {
     font-size: 11px;
     color: var(--muted);
     font-family: "SF Mono", Menlo, Consolas, monospace;
@@ -2464,7 +2487,7 @@
     </div>
     <button id="wrap-toggle" class="toggle" title="Toggle line wrapping in source view">Wrap</button>
     <button id="wide-toggle" class="toggle" title="Render fragment edge-to-edge instead of in a 880px reading column">Wide</button>
-    <button id="props-toggle" class="toggle" title="Toggle element styles panel">Styles</button>
+    <button id="props-toggle" class="toggle" title="Toggle Styles / Meta / Media panel">Panels</button>
     <button id="copy-btn" title="Copy HTML to clipboard">Copy HTML</button>
     <button id="save-btn" class="primary" title="Save to disk (overwrite if you've used Save As, otherwise download)">Save</button>
     <button id="save-as-btn" title="Save to a new file (choose location and name)">Save As</button>
@@ -2767,10 +2790,14 @@
             <input type="number" id="media-height" min="1" step="1">
           </label>
         </div>
-        <label class="media-field" data-applies-to="image">
+        <div class="media-field" data-applies-to="image">
           <span>Link to URL</span>
           <input type="text" id="media-link" placeholder="https://&hellip; (wraps image in &lt;a&gt;)" spellcheck="false">
-        </label>
+          <div class="media-link-target">
+            <label><input type="radio" name="media-link-target" value="_self" checked> Same tab</label>
+            <label><input type="radio" name="media-link-target" value="_blank"> New tab / window</label>
+          </div>
+        </div>
         <label class="media-field" data-applies-to="image">
           <span>Caption</span>
           <input type="text" id="media-caption" placeholder="Wraps image in &lt;figure&gt; with &lt;figcaption&gt;">
@@ -7343,6 +7370,11 @@
     const linkEl = document.getElementById('media-link');
     const link = getMediaWrappingLink(img);
     if (linkEl) linkEl.value = link ? (link.getAttribute('href') || '') : '';
+    // Link target (Same tab / New tab) — restore from the <a target="..."> attribute
+    const linkTgt = link ? (link.getAttribute('target') || '_self').toLowerCase() : '_self';
+    const tgtVal = linkTgt === '_blank' ? '_blank' : '_self';
+    const tgtRadio = document.querySelector('input[name="media-link-target"][value="' + tgtVal + '"]');
+    if (tgtRadio) tgtRadio.checked = true;
     // Caption
     const capEl = document.getElementById('media-caption');
     const fig = getMediaWrappingFigure(img);
@@ -7425,28 +7457,39 @@
     if (selectedImg && selectedImg._cwHandle) positionResizeHandle(selectedImg._cwHandle, selectedImg);
     if (selectedImg) positionImageToolbar();
   }
-  function applyMediaLink(url) {
+  function applyMediaLink(url, target) {
     if (!selectedImg) return;
     const img = selectedImg;
-    const existingLink = getMediaWrappingLink(img);
+    let a = getMediaWrappingLink(img);
     if (url) {
-      if (existingLink) {
-        existingLink.setAttribute('href', url);
+      if (a) {
+        a.setAttribute('href', url);
       } else {
         // Wrap img (or its parent figure) in an <a>
         const fig = getMediaWrappingFigure(img);
-        const target = fig || img;
-        const a = img.ownerDocument.createElement('a');
+        const wrapTarget = fig || img;
+        a = img.ownerDocument.createElement('a');
         a.setAttribute('href', url);
-        target.parentNode.insertBefore(a, target);
-        a.appendChild(target);
+        wrapTarget.parentNode.insertBefore(a, wrapTarget);
+        a.appendChild(wrapTarget);
+      }
+      // Apply target + rel (matches the Link dialog's behavior in Item 1b)
+      if (target === '_blank') {
+        a.setAttribute('target', '_blank');
+        a.setAttribute('rel', 'noopener noreferrer');
+      } else {
+        a.removeAttribute('target');
+        const rel = (a.getAttribute('rel') || '').trim();
+        if (rel === 'noopener noreferrer' || rel === 'noopener' || rel === 'noreferrer') {
+          a.removeAttribute('rel');
+        }
       }
     } else {
-      if (existingLink) {
+      if (a) {
         // Unwrap
-        const parent = existingLink.parentNode;
-        while (existingLink.firstChild) parent.insertBefore(existingLink.firstChild, existingLink);
-        parent.removeChild(existingLink);
+        const parent = a.parentNode;
+        while (a.firstChild) parent.insertBefore(a.firstChild, a);
+        parent.removeChild(a);
       }
     }
   }
@@ -7576,7 +7619,17 @@
   });
   document.getElementById('media-width').addEventListener('input', (e) => applyMediaSize('width', e.target.value));
   document.getElementById('media-height').addEventListener('input', (e) => applyMediaSize('height', e.target.value));
-  document.getElementById('media-link').addEventListener('change', (e) => applyMediaLink(e.target.value.trim()));
+  function readMediaLinkTarget() {
+    const r = document.querySelector('input[name="media-link-target"]:checked');
+    return r ? r.value : '_self';
+  }
+  document.getElementById('media-link').addEventListener('change', (e) => applyMediaLink(e.target.value.trim(), readMediaLinkTarget()));
+  document.querySelectorAll('input[name="media-link-target"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const url = (document.getElementById('media-link').value || '').trim();
+      if (url) applyMediaLink(url, readMediaLinkTarget());
+    });
+  });
   document.getElementById('media-caption').addEventListener('change', (e) => applyMediaCaption(e.target.value));
   document.getElementById('media-shadow').addEventListener('change', (e) => applyMediaShadow(e.target.value));
   document.getElementById('media-radius').addEventListener('input', (e) => applyMediaRadius(e.target.value));
